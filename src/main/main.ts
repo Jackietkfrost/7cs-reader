@@ -28,30 +28,6 @@ function LibraryLoad() {
   });
 }
 
-// WARNING: THIS FUNCTION IS THE OLD VERSION, KEPT FOR REFERENCE. WHEN WE MOVE THIS TO SCM, THIS FUNCTION COMMENT SHOULD BE REMOVED.
-// function LibraryLoad() {
-
-//   const epubsDirectory = path.join(__dirname, '..', '..', 'assets', 'epubs');
-//   const files = fs.readdirSync(epubsDirectory);
-
-//   files
-//     .filter((file) => path.extname(file).toLowerCase() === '.epub')
-//     .forEach((file) => {
-//       const epubPath = path.join(epubsDirectory, file);
-//       const book = new EPub(epubPath);
-//       book.on('end', () => {
-//         console.log('End event triggered for book:', book);
-//         libraryArr.push(book); // Add each book object to the array
-//         console.log('mainWindow:', mainWindow);
-
-//         const serializedLibraryArr = JSON.stringify(libraryArr); // Serialize the array
-
-//         mainWindow.webContents.send('send-library', serializedLibraryArr); // Send the serialized library array
-//       });
-//       book.parse();
-//     });
-// }
-
 // TODO: Create a toast call for when the user loads in a new book.
 // On loading in a new book, Validate that we don't already have that file. if we have that ISBN,
 // Send an error toast.
@@ -91,8 +67,6 @@ ipcMain.on('library-sort', (event, arg) => {
       }
       return 0; // Note: Metadata should always be defined, but we should add an alert if that were to change.
     });
-
-    console.log('libraryArr:', libraryArr);
     if (mainWindow) {
       mainWindow.webContents.send('update-library', JSON.stringify(libraryArr));
     }
@@ -105,8 +79,6 @@ ipcMain.on('library-sort', (event, arg) => {
       }
       return 0; // Note: Metadata should always be defined, but we should add an alert if that were to change.
     });
-
-    console.log('libraryArr:', libraryArr);
     if (mainWindow) {
       mainWindow.webContents.send('update-library', JSON.stringify(libraryArr));
     }
@@ -118,7 +90,6 @@ ipcMain.on('library-sort', (event, arg) => {
         // return (a.metadata.author || '').localeCompare(b.metadata.author || '');
         return 0;
       }
-      console.log('libraryArr:', libraryArr);
       if (mainWindow) {
         mainWindow.webContents.send('update-library');
       }
