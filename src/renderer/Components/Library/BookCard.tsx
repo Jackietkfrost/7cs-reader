@@ -1,13 +1,20 @@
 /* eslint-disable react/function-component-definition */
 // BookCard.tsx
-import React from 'react';
-import { Card } from '@blueprintjs/core';
+import React, { useState } from 'react';
+import {
+  Card,
+  ContextMenu,
+  Menu,
+  MenuDivider,
+  MenuItem,
+  Overlay,
+} from '@blueprintjs/core';
 import BookImage from './BookImage';
+import TagsEditor from './TagsEditor';
 
 interface BookCardProps {
   title: string;
   author: string;
-  description: string;
   ISBN: any;
   coverImageSrc: string;
 }
@@ -16,44 +23,79 @@ interface BookCardProps {
 const BookCard: React.FC<BookCardProps> = ({
   title,
   author,
-  description,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ISBN,
   coverImageSrc,
 }) => {
-  const stripHtmlTags = (html: string) => {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.textContent || div.innerText || '';
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const handleCardClick = () => {
+    // Grab the book's content and send it to the Reader Panel.
+    // Update the 'Last Opened' property of the book in the library.
+    window.electron.ipcRenderer.sendMessage('get-book-content', title);
   };
 
-  const strippedDescription = description
-    ? stripHtmlTags(description)
-    : 'No Description Provided';
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+  };
 
-  const truncatedDescription =
-    strippedDescription.length > 140
-      ? `${strippedDescription.substring(0, 140)}...`
-      : strippedDescription;
+  const openDialog = () => {
+    setIsDialogOpen(true);
+  };
 
-  const handleCardClick = () => {
-    // Send a message to the main process to give us the book's content to display on the Reader Panel.
-    window.electron.ipcRenderer.sendMessage('get-book-content', title);
-    // Grab the book's toc and send it to the Reader Panel.
+  const closeDialog = () => {
+    setIsDialogOpen(false);
   };
 
   return (
-    <Card className="BookCard" interactive onClick={handleCardClick}>
-      <div className="bookContent">
-        <div className="bookImage">
-          <BookImage src={coverImageSrc} alt="Cover art is not available." />
-        </div>
-        <div className="bookText">
-          <h4>{title}</h4>
-          <h6>{author}</h6>
-          <p>{truncatedDescription}</p>
-        </div>
-      </div>
-    </Card>
+    <div onContextMenu={handleContextMenu}>
+      <ContextMenu
+        className="bp5-dark"
+        content={
+          <Menu>
+            <MenuItem text="Rename.." icon="edit" />
+            <MenuItem text="Edit Metadata" icon="eye-open" />
+            <MenuItem text="Edit Tags.." icon="tag" onClick={openDialog} />
+            <MenuItem
+              text="Find in Explorer"
+              icon="folder-open"
+              onClick={() =>
+                window.electron.ipcRenderer.sendMessage(
+                  'find-in-explorer',
+                  title,
+                )
+              }
+            />
+            <MenuDivider />
+            <MenuItem
+              text="Delete"
+              icon="trash"
+              intent="danger"
+              onClick={() =>
+                window.electron.ipcRenderer.sendMessage('delete-book', title)
+              }
+            />
+          </Menu>
+        }
+      >
+        <Card className="BookCard" interactive onClick={handleCardClick}>
+          <div className="bookContent">
+            <div className="bookImage">
+              <BookImage
+                src={coverImageSrc}
+                alt="Cover art is not available."
+              />
+            </div>
+            <div className="bookText">
+              <h4>{title}</h4>
+              <h6>{author}</h6>
+            </div>
+          </div>
+        </Card>
+        <Overlay isOpen={isDialogOpen} onClose={closeDialog}>
+          <TagsEditor isOpen={isDialogOpen} onClose={closeDialog} />
+        </Overlay>
+      </ContextMenu>
+    </div>
   );
 };
 
