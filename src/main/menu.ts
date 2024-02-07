@@ -260,7 +260,7 @@ export default class MenuBuilder {
           {
             label: 'Learn More',
             click() {
-              shell.openExternal('https://electronjs.org');
+              shell.openExternal('https://www.am-x2.com/7csReader#About');
             },
           },
           {
@@ -288,7 +288,9 @@ export default class MenuBuilder {
           {
             label: 'About',
             click() {
-              shell.openExternal('https://www.am-x2.com/projects/7cs-reader.html');
+              shell.openExternal(
+                'https://www.am-x2.com/projects/7cs-reader.html',
+              );
             },
           },
         ],
