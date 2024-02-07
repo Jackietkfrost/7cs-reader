@@ -13,7 +13,9 @@ export type Channels =
   | 'get-book-content'
   | 'delete-book'
   | 'find-in-explorer'
-  | 'get-book-library';
+  | 'get-book-library'
+  | 'add-tag'
+  | 'remove-tag';
 
 const electronHandler = {
   ipcRenderer: {
