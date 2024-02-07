@@ -11,6 +11,8 @@ export type Channels =
   | 'update-library'
   | 'add-new-book'
   | 'get-book-content'
+  | 'delete-book'
+  | 'find-in-explorer'
   | 'get-book-library';
 
 const electronHandler = {
