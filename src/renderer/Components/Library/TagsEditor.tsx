@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Dialog, Classes, Button, Intent, TagInput } from '@blueprintjs/core';
+import {
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  Classes,
+  Button,
+  Intent,
+  TagInput,
+} from '@blueprintjs/core';
 
 interface TagsEditorProps {
   isOpen: boolean;
@@ -13,30 +21,36 @@ function TagsEditor({ isOpen, onClose }: TagsEditorProps) {
     setTags(newTags.map((tag) => String(tag)));
   };
 
+  const handleOnAddTag = () => {
+    window.electron.ipcRenderer.sendMessage('add-tag', tags);
+  };
+
   return (
     <Dialog
       isOpen={isOpen}
       onClose={onClose}
       title="Tags Editor"
       className={Classes.DARK}
+      icon="tag"
     >
-      <div className={Classes.DIALOG_BODY}>
+      <DialogBody>
         <TagInput
           large
           fill
           values={tags}
           onChange={handleTagInputChange}
           placeholder="Add tags..."
+          addOnBlur
+          onAdd={handleOnAddTag}
         />
-      </div>
-      <div className={Classes.DIALOG_FOOTER}>
-        <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={onClose}>Cancel</Button>
+      </DialogBody>
+      <DialogFooter
+        actions={
           <Button intent={Intent.PRIMARY} onClick={onClose}>
-            Accept
+            Done
           </Button>
-        </div>
-      </div>
+        }
+      />
     </Dialog>
   );
 }
