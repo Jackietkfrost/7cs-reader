@@ -19,8 +19,9 @@ function BookLibrary({ bookList }) {
             key={book.metadata.ISBN}
             title={book.metadata.title}
             author={book.metadata.creator}
-            description={book.metadata.description}
+            // description={book.metadata.description}
             ISBN={book.metadata.ISBN}
+            coverImageSrc={book.metadata.coverImageSrc}
           />
         ),
       )}
