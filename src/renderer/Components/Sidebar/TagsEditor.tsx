@@ -5,7 +5,6 @@ import {
   DialogFooter,
   Classes,
   Button,
-  Intent,
   TagInput,
 } from '@blueprintjs/core';
 
@@ -46,7 +45,7 @@ function TagsEditor({ isOpen, onClose }: TagsEditorProps) {
       </DialogBody>
       <DialogFooter
         actions={
-          <Button intent={Intent.PRIMARY} onClick={onClose}>
+          <Button intent="primary" onClick={onClose}>
             Done
           </Button>
         }

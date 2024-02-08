@@ -7,7 +7,6 @@ import {
   Menu,
   MenuDivider,
   MenuItem,
-  Overlay,
 } from '@blueprintjs/core';
 import BookImage from './BookImage';
 import TagsEditor from './TagsEditor';
@@ -27,7 +26,13 @@ const BookCard: React.FC<BookCardProps> = ({
   ISBN,
   coverImageSrc,
 }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isTagsEditorOpen, setIsTagsEditorOpen] = useState(false);
+  const handleOpenTagsEditor = () => {
+    setIsTagsEditorOpen(true);
+  };
+  const closeTagsEditor = () => {
+    setIsTagsEditorOpen(false);
+  };
   const handleCardClick = () => {
     // Grab the book's content and send it to the Reader Panel.
     // Update the 'Last Opened' property of the book in the library.
@@ -38,14 +43,6 @@ const BookCard: React.FC<BookCardProps> = ({
     event.preventDefault();
   };
 
-  const openDialog = () => {
-    setIsDialogOpen(true);
-  };
-
-  const closeDialog = () => {
-    setIsDialogOpen(false);
-  };
-
   return (
     <div onContextMenu={handleContextMenu}>
       <ContextMenu
@@ -54,7 +51,11 @@ const BookCard: React.FC<BookCardProps> = ({
           <Menu>
             <MenuItem text="Rename.." icon="edit" />
             <MenuItem text="Edit Metadata" icon="eye-open" />
-            <MenuItem text="Edit Tags.." icon="tag" onClick={openDialog} />
+            <MenuItem
+              text="Edit Tags.."
+              icon="tag"
+              onClick={handleOpenTagsEditor}
+            />
             <MenuItem
               text="Find in Explorer"
               icon="folder-open"
@@ -91,9 +92,7 @@ const BookCard: React.FC<BookCardProps> = ({
             </div>
           </div>
         </Card>
-        <Overlay isOpen={isDialogOpen} onClose={closeDialog}>
-          <TagsEditor isOpen={isDialogOpen} onClose={closeDialog} />
-        </Overlay>
+        <TagsEditor isOpen={isTagsEditorOpen} onClose={closeTagsEditor} />
       </ContextMenu>
     </div>
   );
