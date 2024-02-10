@@ -67,3 +67,39 @@
 .library-sorter {
   background-color: #282c34;
 }
+
+.library-body {
+  background-color: #282c34;
+  color: #ffffff;
+}
+
+
+body {
+  background-color: #282c34;
+}
+
+.book-tile-title {
+  padding-top: 10px;
+  width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.book-tile:hover {
+  transform: scale(1.2);
+}
+
+.image-container:hover {
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 1px 5px 20px rgba(0, 0, 0, 0.664);
+}
+.book-tile {
+  position: relative;
+  padding: 10px;
+  margin: 10px;
+  transition: transform 0.3s, box-shadow 0.3s; /* Add transition for smooth hover effect */
+}
+
+.image-container {
+  transition: transform 0.3s; /* Add transition for smooth hover effect */
+}
