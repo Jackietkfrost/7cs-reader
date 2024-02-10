@@ -1,10 +1,11 @@
 /* eslint-disable no-console */
 import { Button, Card, Drawer } from '@blueprintjs/core';
 import { useState, useEffect } from 'react';
-import BookLibrary from './Components/Library/BookLibrary';
-import LibrarySort from './Components/Library/LibrarySort';
-import ReaderPanel from './Components/Reader/ReaderPanel';
+import BookLibrary from './Components/Sidebar/BookLibrary';
+import LibrarySort from './Components/Sidebar/LibrarySort';
+import LibraryPanel from './Components/Reader/Library/LibraryPanel';
 import './App.css';
+import ReaderPanel from './Components/Reader/ReaderPanel';
 
 function NewBookButton() {
   const handleClick = () => {
@@ -22,6 +23,7 @@ function Hello() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [bookList, setBookList] = useState([]);
   const [sortedBooks, setSortedBooks] = useState([]);
+  const [hasBookSelected, setBookSelected] = useState();
 
   useEffect(() => {
     window.electron.ipcRenderer.on('send-library', (receivedBookList: any) => {
@@ -43,7 +45,11 @@ function Hello() {
   return (
     <div className="App">
       <div className="reader-header">
-        <ReaderPanel />
+        {hasBookSelected ? (
+          <ReaderPanel />
+        ) : (
+          <LibraryPanel bookLibrary={sortedBooks} />
+        )}
         <div className="ButtonContainer">
           <Button
             icon="menu"
