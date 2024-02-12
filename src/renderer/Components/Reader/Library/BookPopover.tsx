@@ -1,3 +1,5 @@
+import RatingSystem from './RatingSystem';
+
 interface TilePopoverProps {
   title: string;
   description: string;
@@ -10,9 +12,18 @@ function BookPopover({ title, description }: TilePopoverProps) {
     return tempEl.textContent || tempEl.innerText || '';
   };
   return (
-    <div style={{ padding: '10px' }}>
-      <h2>{title}</h2>
-      <p>{sanitizeHTML(description)}</p>
+    <div
+      style={{ backgroundColor: '#1f1f1f', color: '#adadad', padding: '10px' }}
+    >
+      <h2>
+        {title}
+        <RatingSystem />
+      </h2>
+
+      <br />
+      <p style={{ maxWidth: '500px', maxHeight: '300px', overflowY: 'auto' }}>
+        {sanitizeHTML(description)}
+      </p>
     </div>
   );
 }
