@@ -9,6 +9,7 @@ function BookImage({ src, alt }: BookImageProps) {
   const placeholderSrc = 'https://via.placeholder.com/80x110';
   return (
     <img
+      className="image-container"
       src={src || placeholderSrc} // Use the placeholderSrc if src is falsy
       alt={alt}
     />
