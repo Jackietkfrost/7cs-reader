@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable func-names */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 import path from 'path';
@@ -96,6 +97,56 @@ ipcMain.on('library-sort', (event, arg) => {
       return 0;
     });
   }
+});
+
+// TODO Create a function that will handle tags, and call on it with either IPC Add or Remove.
+function handleTags(bAdding: boolean, tags: any[]) {
+  // TODO: Database management calls depending on type of boolean we receive from the add and remove tag events.
+  // eslint-disable-next-line no-unused-expressions
+  bAdding ? console.log('Adding Tag!') : console.log('Not adding tag.');
+}
+
+// Turn this into a handle(Invoke?), send back JSON with all tags, and if adding the tag to the book was a success/failure.
+ipcMain.on('add-tag', (_event, tagToAdd) => {
+  console.log('WIP Add Tags pong!');
+  handleTags(true, tagToAdd);
+});
+
+// Same as above, turn into a handle, send back JSON with all tags, and if removing it was a success/failure.
+ipcMain.on('remove-tag', (_event, tagToRemove) => {
+  console.log('WID Remove Tags pong!');
+  handleTags(false, tagToRemove);
+});
+
+// Should be a handle. Send back a response letting user know we deleted the book,
+// and update the library to reflect the changed state.
+// NOTE: Should receive a boolean from frontend, if true, delete custom data json/database object.
+ipcMain.on('delete-book', (event, { bookToBeDeleted, deleteCustom }) => {
+  console.log(
+    `Deleting book ${bookToBeDeleted}... \n Deleting Custom? ${deleteCustom}`,
+  );
+  try {
+    // Delete book
+  } catch (error) {
+    console.error('Shit we fucked up, delete Sys32. Error:', error);
+  }
+});
+
+// TODO: Open Directory Explorer directly on path to the object's location.
+// We need to receive either a book index ID, or some sort of identification
+// to know what book to open on within the file explorer.
+ipcMain.on('find-in-explorer', (event, book) => {
+  console.log(`Getting book path: ${book}`);
+  // Open folder directory. Account for it being on a mac system,
+  // and open their location for the epub. Needs to be tested in production.
+});
+
+// TODO: Set up the command to return the pages necessary for client to view from the Epub.
+// And make sure it's sent correctly and not like some fucked up garbled mess. Maybe sanitize the
+// html away, and get the text only. Account for pictures, or covers, or not. Just send the data to
+// frontend.
+ipcMain.on('get-book-content', (event, bookId) => {
+  console.log(' WIP Get book Data');
 });
 
 if (process.env.NODE_ENV === 'production') {
