@@ -3,19 +3,19 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels =
-  | 'ipc-example'
-  | 'send-library'
+  | 'ipc-example' // Added functionality
+  | 'send-library' // Added functionality
   | 'epub-coverart'
   | 'epub-text'
-  | 'library-sort'
-  | 'update-library'
-  | 'add-new-book'
+  | 'library-sort' // Added functionality
+  | 'update-library' // Added functionality
+  | 'add-new-book' // Added functionality
   | 'get-book-content'
-  | 'delete-book'
-  | 'find-in-explorer'
+  | 'delete-book' // Added WIP
+  | 'find-in-explorer' // Added WIP
   | 'get-book-library'
-  | 'add-tag'
-  | 'remove-tag';
+  | 'add-tag' // Added WIP
+  | 'remove-tag'; // Added WIP
 
 const electronHandler = {
   ipcRenderer: {
