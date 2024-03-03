@@ -100,6 +100,18 @@ body {
   transition: transform 0.3s, box-shadow 0.3s; /* Add transition for smooth hover effect */
 }
 
+.book-tile-popover {
+  background-color: #282c34;
+}
+
 .image-container {
   transition: transform 0.3s; /* Add transition for smooth hover effect */
+}
+
+.favorite-icon:hover {
+  color: yellow;
+  transition: .3s ease-in-out;
+}
+.favorite-icon.active {
+  color: yellow; /* Color for favorite-icon when active */
 }
