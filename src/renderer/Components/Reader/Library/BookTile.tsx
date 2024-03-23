@@ -6,14 +6,21 @@ import { Popover } from '@blueprintjs/core';
 import BookImage from '../../Sidebar/BookImage';
 import BookPopover from './BookPopover';
 
-interface bookTileProps {
+interface BookTileProps {
   title: string;
   artist: string;
   description: string;
-  onClick: () => void;
 }
 
-function BookTile({ title, artist, description, onClick }: bookTileProps) {
+function BookTile({ title, artist, description }: BookTileProps) {
+  const handleClick = () => {
+    window.electron.ipcRenderer.sendMessage('get-book-content', title);
+  };
+  const handleOnKeyDown = (event: React.KeyboardEvent<HTMLImageElement>) => {
+    if (event.key === 'Enter') {
+      handleClick();
+    }
+  };
   return (
     <Popover
       hoverOpenDelay={500}
@@ -25,7 +32,13 @@ function BookTile({ title, artist, description, onClick }: bookTileProps) {
       }
       popoverClassName="book-tile-popover"
     >
-      <div className="book-tile" onClick={onClick}>
+      <div
+        className="book-tile"
+        onClick={handleClick}
+        tabIndex={0}
+        onKeyDown={handleOnKeyDown}
+        role="button"
+      >
         <BookImage src="https://via.placeholder.com/80x110" alt="Book Cover" />
         <h4
           className="book-tile-title"
