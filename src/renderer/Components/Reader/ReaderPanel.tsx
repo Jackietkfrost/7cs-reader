@@ -1,13 +1,24 @@
 import React from 'react';
-import { Button, Card } from '@blueprintjs/core';
 
-const ReaderPanel = () => {
-  return (
-    <header className="App-header">
-        Book Name
+interface ReaderPanelProps {
+  clickedBookName: string;
+  clickedBookContent: string;
+}
 
-      </header>
-  );
-};
+function ReaderPanel({
+  clickedBookName,
+  clickedBookContent,
+}: ReaderPanelProps) {
+  const [bookName, setBookName] = React.useState('Book Name');
+  if (bookName)
+    return (
+      <>
+        <header className="App-header">{bookName}</header>
+        <div className="book-content">
+          <span>Book Content</span>
+        </div>
+      </>
+    );
+}
 
 export default ReaderPanel;
