@@ -19,8 +19,6 @@ function handleLibraryLoad(
       const epubPath = path.join(epubsDirectory, file);
       const book = new EPub(epubPath);
       book.on('end', () => {
-        // console.log('End event triggered for book:', book);
-
         // Check if the book is already in libraryArr
         const isBookUnique = libraryArr.every(
           (existingBook) => existingBook.metadata.ISBN !== book.metadata.ISBN,
