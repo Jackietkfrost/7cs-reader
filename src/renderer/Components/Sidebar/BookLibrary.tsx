@@ -2,7 +2,10 @@
 import React from 'react';
 import BookCard from './BookCard';
 
-function BookLibrary({ bookList }) {
+interface BookLibraryProps {
+  bookList: any[];
+}
+function BookLibrary({ bookList }: BookLibraryProps) {
   return (
     <div>
       {bookList.map(
