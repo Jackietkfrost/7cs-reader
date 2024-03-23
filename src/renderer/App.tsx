@@ -6,6 +6,7 @@ import LibrarySort from './Components/Sidebar/LibrarySort';
 import LibraryPanel from './Components/Reader/Library/LibraryPanel';
 import './App.css';
 import ReaderPanel from './Components/Reader/ReaderPanel';
+import ActivityBar from './Components/ActivityBar';
 
 function NewBookButton() {
   const handleClick = () => {
@@ -23,8 +24,11 @@ function Hello() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [bookList, setBookList] = useState([]);
   const [sortedBooks, setSortedBooks] = useState([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hasBookSelected, setBookSelected] = useState();
+  const [selectedBook, setSelectedBook] = useState('BookName');
 
+  // Only get the library and update the library once.. I think?
   useEffect(() => {
     window.electron.ipcRenderer.on('send-library', (receivedBookList: any) => {
       const parsedBookList = JSON.parse(receivedBookList);
@@ -42,13 +46,33 @@ function Hello() {
     });
   }, []);
 
+  const handleBookClick = (book: any) => {
+    setSelectedBook(book);
+  };
+
   return (
     <div className="App">
+      <div
+        className="activity-bar"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <ActivityBar />
+      </div>
       <div className="reader-header">
         {hasBookSelected ? (
-          <ReaderPanel />
+          <ReaderPanel
+            clickedBookName={selectedBook.metadata.title}
+            clickedBookContent="selectedBook"
+          />
         ) : (
-          <LibraryPanel bookLibrary={sortedBooks} />
+          <LibraryPanel
+            bookLibrary={sortedBooks}
+            onBookClick={handleBookClick}
+          />
         )}
         <div className="ButtonContainer">
           <Button
