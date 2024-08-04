@@ -1,0 +1,19 @@
+{
+    "desc": {},
+    "title": {
+        "main": "7C's Reader",
+        "reader": "Reader Screen",
+        "labels": "Labels",
+        "starred": "Starred",
+        "error": "Unknown Error",
+        "change-theme": "Change Theme"
+    },
+    "menu": {
+        "change-theme": "Change Theme",
+        "change-language": "Change Language",
+        "documentation": "Documentation",
+        "github": "Source Code",
+        "open-file": "Open a text file",
+        "add-book": "Add a new book"
+    }
+}
