@@ -1,6 +1,7 @@
 import { ipcMain, IpcMainEvent, dialog } from "electron"
 import Constants from "./utils/Constants"
 import { promises as fs } from "fs"
+import * as path from "path"
 /*
  * IPC Communications
  * */
@@ -50,6 +51,14 @@ export default class IPCs {
                 properties: ["openFile"],
                 filters
             })
+
+            if (!dialogResult.canceled) {
+                const source = dialogResult.filePaths[0]
+
+                const destinationPath = path.join(Constants.BOOK_FOLDER, path.basename(source))
+                await fs.copyFile(source, destinationPath)
+                return destinationPath
+            }
 
             return dialogResult
         })
