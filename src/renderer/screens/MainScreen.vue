@@ -20,6 +20,7 @@
                         :book="book"
                         :book-path="bookPath"
                         @click="handleOpenBook(book, '/reader')"
+                        @contextmenu="onContextMenu(book)"
                     >
                     </book-card>
                 </v-col>
@@ -36,7 +37,7 @@
                             justify-content: center;
                         "
                         color="primary"
-                        @click="handleOpenFile"
+                        @click="handleAddBook"
                     >
                         <v-avatar
                             size="64"
@@ -83,17 +84,21 @@ const theme = useTheme()
 const cardHeight = theme.current.value.variables["card-height"]
 const { locale, availableLocales } = useI18n()
 const languages = ref(["en"])
-const selectedFile = ref("")
 const books = ref<string[]>([])
 const bookPath = ref<string>("")
 const router = useRouter()
+
 onMounted((): void => {
     languages.value = availableLocales
     getBooks()
     getBookPath()
 })
 
-watch(books, (newValue, oldValue) => {})
+watch(books, (newValue, oldValue) => {
+    if (newValue.length > oldValue.length) {
+        getBooks()
+    }
+})
 
 async function getBooks(): Promise<void> {
     const bookList = await window.sevenCsApi.invoke("msgGetBooks")
@@ -109,10 +114,10 @@ const handleChangeLanguage = (val: string): void => {
     locale.value = val
 }
 
-const handleOpenFile = async () => {
+const handleAddBook = async () => {
     const dialogResult = await addBook("epub")
     if (!dialogResult.canceled) {
-        selectedFile.value = dialogResult.filePaths[0]
+        getBooks()
     }
 }
 
@@ -120,4 +125,15 @@ const handleOpenBook = (selectedFile: string, path: string): void => {
     setBookName(selectedFile)
     router.push({ path })
 }
+
+const onContextMenu = async (book: string) => {
+    window.sevenCsApi.invoke("openContextMenu", book).then((value) => {
+        console.log(value)
+    })
+}
+
+window.sevenCsApi.on("deleteConfirmed", (event, message) => {
+    console.log("delete Confirmed")
+    getBooks()
+})
 </script>

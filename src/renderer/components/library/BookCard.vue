@@ -28,6 +28,7 @@ import { VueReader } from "vue-reader"
 import { ref } from "vue"
 import { Rendition } from "epubjs"
 import { useTheme } from "vuetify"
+
 const theme = useTheme()
 const cardHeight = theme.current.value.variables["card-height"]
 const information = ref()
@@ -44,6 +45,7 @@ const getRendition = (rendition: Rendition) => {
     })
 }
 </script>
+
 <style scoped>
 .v-card-title h4 {
     font-size: 1.25rem !important;

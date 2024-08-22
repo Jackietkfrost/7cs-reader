@@ -9,11 +9,13 @@ const mainAvailChannels: string[] = [
     "msgOpenBook",
     "msgAddBook",
     "msgGetBookPath",
-    "eSendLibrary"
+    "eSendLibrary",
+    "openContextMenu",
+    "deleteBook"
 ]
 
 // rendererAvailChannels: Whitelist of valid channels used for IPC communication (Send message from Renderer to Main)
-const rendererAvailChannels: string[] = ["rFindInExplorer", "rSetTags"]
+const rendererAvailChannels: string[] = ["rFindInExplorer", "rSetTags", "deleteConfirmed"]
 
 contextBridge.exposeInMainWorld("sevenCsApi", {
     send: (channel: string, ...data: any[]): void => {
