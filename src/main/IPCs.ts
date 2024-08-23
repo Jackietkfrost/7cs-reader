@@ -1,10 +1,8 @@
-import { ipcMain, IpcMainEvent, dialog, Menu, MenuItem, webContents } from "electron"
-import { EventEmitter } from "node:events"
+import { ipcMain, IpcMainEvent, dialog, Menu, MenuItem, webContents, shell } from "electron"
 import Constants from "./utils/Constants"
 import { promises as fs } from "fs"
 import * as path from "path"
 
-const mainEmitter = new EventEmitter()
 /*
  * IPC Communications
  * */
@@ -68,14 +66,19 @@ export default class IPCs {
             contextMenu.append(
                 new MenuItem({
                     label: "Open Book",
-                    click: () => console.log("Open clicked")
+                    click: () => {
+                        webContents.getFocusedWebContents().send("openBook", bookFile)
+                    }
                 })
             )
 
             contextMenu.append(
                 new MenuItem({
                     label: "Reveal in Explorer",
-                    click: () => console.log("Reveal clicked")
+                    click: () => {
+                        const bookPath = path.join(Constants.BOOK_FOLDER + "\\" + bookFile)
+                        shell.showItemInFolder(bookPath)
+                    }
                 })
             )
 

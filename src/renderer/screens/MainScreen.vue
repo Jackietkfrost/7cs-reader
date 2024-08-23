@@ -92,6 +92,7 @@ onMounted((): void => {
     languages.value = availableLocales
     getBooks()
     getBookPath()
+    console.log(books)
 })
 
 watch(books, (newValue, oldValue) => {
@@ -135,5 +136,9 @@ const onContextMenu = async (book: string) => {
 window.sevenCsApi.on("deleteConfirmed", (event, message) => {
     console.log("delete Confirmed")
     getBooks()
+})
+
+window.sevenCsApi.on("openBook", (event, message) => {
+    handleOpenBook(message, "/reader")
 })
 </script>
