@@ -1,6 +1,15 @@
 <template>
     <v-container>
         <h1> {{ $t("title.main") }} Library</h1>
+        <v-snackbar
+            v-model="snackbar"
+            variant="elevated"
+            :color="theme.current.value.colors.warning"
+            location="top"
+            multi-line
+        >
+            {{ snackText }}</v-snackbar
+        >
         <v-row no-gutters class="text-center">
             <v-row class="my-2">
                 <v-col
@@ -87,6 +96,8 @@ const languages = ref(["en"])
 const books = ref<string[]>([])
 const bookPath = ref<string>("")
 const router = useRouter()
+const snackbar = ref<boolean>(false)
+const snackText = ref<string>("")
 
 onMounted((): void => {
     languages.value = availableLocales
@@ -141,4 +152,17 @@ window.sevenCsApi.on("deleteConfirmed", (event, message) => {
 window.sevenCsApi.on("openBook", (event, message) => {
     handleOpenBook(message, "/reader")
 })
+
+window.sevenCsApi.on("editTags", (event, message) => {
+    showSnackbar(message)
+})
+
+window.sevenCsApi.on("editMeta", (event, message) => {
+    showSnackbar(message)
+})
+
+const showSnackbar = (message: string): void => {
+    snackText.value = message
+    snackbar.value = true
+}
 </script>

@@ -19,7 +19,9 @@ const rendererAvailChannels: string[] = [
     "rFindInExplorer",
     "rSetTags",
     "deleteConfirmed",
-    "openBook"
+    "openBook",
+    "editTags",
+    "editMeta"
 ]
 
 contextBridge.exposeInMainWorld("sevenCsApi", {

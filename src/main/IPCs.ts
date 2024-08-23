@@ -87,14 +87,18 @@ export default class IPCs {
             contextMenu.append(
                 new MenuItem({
                     label: "Edit Tags...",
-                    click: () => console.log("Edit clicked")
+                    click: () => {
+                        webContents.getFocusedWebContents().send("editTags", "Work In Progress!")
+                    }
                 })
             )
 
             contextMenu.append(
                 new MenuItem({
                     label: "Edit Custom Metadata...",
-                    click: () => console.log(bookFile)
+                    click: () => {
+                        webContents.getFocusedWebContents().send("editMeta", "Work In Progress!")
+                    }
                 })
             )
 
