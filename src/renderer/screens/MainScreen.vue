@@ -4,7 +4,7 @@
         <v-snackbar
             v-model="snackbar"
             variant="elevated"
-            :color="theme.current.value.colors.warning"
+            :color="snackbarColor"
             location="top"
             multi-line
         >
@@ -98,6 +98,7 @@ const bookPath = ref<string>("")
 const router = useRouter()
 const snackbar = ref<boolean>(false)
 const snackText = ref<string>("")
+const snackbarColor = ref()
 
 onMounted((): void => {
     languages.value = availableLocales
@@ -145,7 +146,7 @@ const onContextMenu = async (book: string) => {
 }
 
 window.sevenCsApi.on("deleteConfirmed", (event, message) => {
-    console.log("delete Confirmed")
+    showSnackbar(message, "info")
     getBooks()
 })
 
@@ -154,15 +155,22 @@ window.sevenCsApi.on("openBook", (event, message) => {
 })
 
 window.sevenCsApi.on("editTags", (event, message) => {
-    showSnackbar(message)
+    showSnackbar(message, "warning")
 })
 
 window.sevenCsApi.on("editMeta", (event, message) => {
-    showSnackbar(message)
+    showSnackbar(message, "warning")
 })
 
-const showSnackbar = (message: string): void => {
+const showSnackbar = (message: string, type: string): void => {
     snackText.value = message
     snackbar.value = true
+    const colorMap = {
+        error: theme.current.value.colors.error,
+        info: theme.current.value.colors.info,
+        warning: theme.current.value.colors.warning
+    }
+
+    snackbarColor.value = colorMap[type]
 }
 </script>

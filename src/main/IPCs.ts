@@ -151,7 +151,6 @@ export default class IPCs {
                         })
                         if (deleteConfirmed === 0) {
                             deleteBook(bookFile)
-                            ipcMain.emit("deleteConfirmed")
                         }
                     }
                 })
@@ -164,7 +163,9 @@ export default class IPCs {
             try {
                 await fs.unlink(bookPath)
                 console.log("Book deleted")
-                webContents.getFocusedWebContents().send("deleteConfirmed")
+                webContents
+                    .getFocusedWebContents()
+                    .send("deleteConfirmed", "Book was successfully deleted!")
             } catch (error) {
                 console.error(`Error deleting book: ${error}`)
             }
