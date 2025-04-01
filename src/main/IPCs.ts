@@ -87,6 +87,7 @@ export default class IPCs {
             contextMenu.append(
                 new MenuItem({
                     label: "Edit Tags...",
+                    enabled: false,
                     click: () => {
                         webContents.getFocusedWebContents().send("editTags", "Work In Progress!")
                     }
@@ -96,6 +97,7 @@ export default class IPCs {
             contextMenu.append(
                 new MenuItem({
                     label: "Edit Custom Metadata...",
+                    enabled: false,
                     click: () => {
                         webContents.getFocusedWebContents().send("editMeta", "Work In Progress!")
                     }
@@ -107,6 +109,7 @@ export default class IPCs {
             contextMenu.append(
                 new MenuItem({
                     label: "Rate",
+                    enabled: false,
                     submenu: [
                         {
                             label: "1",
