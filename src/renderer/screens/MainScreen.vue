@@ -1,5 +1,6 @@
 <template>
     <v-container>
+        <SettingsPage />
         <h1> {{ $t("title.main") }} Library</h1>
         <v-snackbar
             v-model="snackbar"
@@ -84,8 +85,9 @@ import { useBookStore } from "@/renderer/store/bookStore"
 // import { storeToRefs } from "pinia"
 import { onMounted, ref, watch } from "vue"
 import BookCard from "@/renderer/components/library/BookCard.vue"
-import { useTheme } from "vuetify"
 import { useRouter } from "vue-router"
+import { useTheme } from "vuetify"
+import SettingsPage from "../components/SettingsPage.vue"
 // import BookContextMenu from "../components/library/BookContextMenu.vue"
 
 const { setBookName } = useBookStore()
@@ -137,6 +139,7 @@ const handleAddBook = async () => {
 const handleOpenBook = (selectedFile: string, path: string): void => {
     setBookName(selectedFile)
     router.push({ path })
+    window.sevenCsApi.invoke("changeActiveButton", "currentBook")
 }
 
 const onContextMenu = async (book: string) => {
