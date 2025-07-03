@@ -5,7 +5,7 @@
                 <v-list density="compact" nav>
                     <v-list-item
                         prepend-icon="mdi-bookshelf"
-                        title="Library"
+                        :title="$t('ui-labels.nav-bar.library')"
                         value="library"
                         :class="{ active: isCurrentRoute('/') }"
                         @click="handleRoute('/')"
@@ -13,21 +13,21 @@
                     <v-list-item
                         :disabled="!isBookSelected"
                         prepend-icon="mdi-book-open-page-variant-outline"
-                        title="Current Book"
+                        :title="$t('ui-labels.nav-bar.current')"
                         value="myfiles"
                         :class="{ active: isCurrentRoute('/reader') }"
                         @click="handleRoute('/reader')"
                     ></v-list-item>
                     <v-list-item
                         prepend-icon="mdi-tag-outline"
-                        title="Labels"
+                        :title="$t('ui-labels.nav-bar.labels')"
                         value="shared"
                         :class="{ active: isCurrentRoute('/labels') }"
                         @click="handleRoute('/labels')"
                     ></v-list-item>
                     <v-list-item
                         prepend-icon="mdi-star-outline"
-                        title="Starred"
+                        :title="$t('ui-labels.nav-bar.starred')"
                         value="starred"
                         :class="{ active: isCurrentRoute('/starred') }"
                         @click="handleRoute('/starred')"
@@ -38,15 +38,16 @@
                         <v-list>
                             <v-list-item
                                 prepend-icon="mdi-cog-outline"
-                                title="Settings"
+                                :title="$t('ui-labels.nav-bar.settings')"
                                 density="comfortable"
                                 flat
                                 value="settings"
+                                @click="openSettings()"
                             ></v-list-item>
                             <v-divider></v-divider>
                             <v-list-item
                                 prepend-icon="mdi-door-open"
-                                title="Exit"
+                                :title="$t('ui-labels.nav-bar.exit')"
                                 density="compact"
                                 class="exit-btn"
                                 flat
@@ -61,6 +62,7 @@
                 <slot />
             </v-main>
         </v-layout>
+        <SettingsPage />
     </v-app>
 </template>
 
@@ -70,10 +72,14 @@ import { useRoute, useRouter } from "vue-router"
 import { storeToRefs } from "pinia"
 import { useBookStore } from "@/renderer/store/bookStore"
 import { ref, watch } from "vue"
+import { useAppStore } from "@/renderer/store/appStore"
+import SettingsPage from "../settings-page.vue"
 // import { useTheme } from "vuetify"
 
 // const theme = useTheme()
-const { bookName } = storeToRefs(useBookStore())
+const bookStore = useBookStore()
+const { bookName } = storeToRefs(bookStore)
+const { setOpenSettings } = useAppStore()
 const isBookSelected = ref(false)
 const router = useRouter()
 const route: any = useRoute()
@@ -89,6 +95,10 @@ const handleRoute = (path: string): void => {
 
 const isCurrentRoute = (path: string): boolean => {
     return path === route.path
+}
+
+const openSettings = (): void => {
+    setOpenSettings(true)
 }
 
 // const handleChangeTheme = (): void => {
