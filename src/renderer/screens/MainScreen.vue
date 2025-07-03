@@ -1,7 +1,6 @@
 <template>
     <v-container>
-        <SettingsPage />
-        <h1> {{ $t("title.main") }} Library</h1>
+        <h1> {{ $t("title.main") }} {{ $t("ui-labels.nav-bar.library") }}</h1>
         <v-snackbar
             v-model="snackbar"
             variant="elevated"
@@ -87,7 +86,6 @@ import { onMounted, ref, watch } from "vue"
 import BookCard from "@/renderer/components/library/BookCard.vue"
 import { useRouter } from "vue-router"
 import { useTheme } from "vuetify"
-import SettingsPage from "../components/SettingsPage.vue"
 // import BookContextMenu from "../components/library/BookContextMenu.vue"
 
 const { setBookName } = useBookStore()
