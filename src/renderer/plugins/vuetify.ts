@@ -35,7 +35,7 @@ export default createVuetify({
                 colors: {
                     primary: colors.cyan.darken1,
                     accent: colors.cyan.accent3,
-                    secondary: colors.cyan.darken1,
+                    secondary: colors.cyan.darken2,
                     success: colors.green.darken3,
                     readerLink: colors.cyan.darken1,
                     backgroundAccent: colors.grey.darken4
