@@ -2,6 +2,7 @@ import { ipcMain, IpcMainEvent, dialog, Menu, MenuItem, webContents, shell } fro
 import Constants from "./utils/Constants"
 import { promises as fs } from "fs"
 import * as path from "path"
+import { getFonts } from "font-list"
 
 /*
  * IPC Communications
@@ -19,6 +20,10 @@ export default class IPCs {
 
         ipcMain.handle("msgGetBookPath", async (event: IpcMainEvent) => {
             return Constants.BOOK_FOLDER
+        })
+
+        ipcMain.handle("msgGetFonts", async (event: IpcMainEvent) => {
+            return getFonts()
         })
 
         // Open file
