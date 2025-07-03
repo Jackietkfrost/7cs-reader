@@ -19,8 +19,8 @@
     "settings": {
         "dark-mode": "Dark Mode",
         "language": "Language",
-        "tag-pages": "Enable Tag Pages",
-        "ratings-pages": "Enable Ratings Pages",
+        "tags-page": "Enable Tag Pages",
+        "ratings-page": "Enable Ratings Pages",
         "fonts": "Book Font",
         "default-font": "Default",
         "font-size": "Book Font Size"
