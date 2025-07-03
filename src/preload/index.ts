@@ -5,6 +5,7 @@ const mainAvailChannels: string[] = [
     "msgRequestGetVersion",
     "msgOpenExternalLink",
     "msgOpenFile",
+    "msgGetFonts",
     "msgGetBooks",
     "msgOpenBook",
     "msgAddBook",
