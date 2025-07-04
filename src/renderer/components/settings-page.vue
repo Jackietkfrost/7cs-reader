@@ -74,9 +74,9 @@
                     </v-col>
                 </v-row>
             </v-card-text>
-            <v-btn color="primary" variant="outlined" @click="appStore.setOpenSettings(false)"
-                >Close</v-btn
-            >
+            <v-btn color="primary" variant="outlined" @click="appStore.setOpenSettings(false)">{{
+                $t("ui-labels.close-button")
+            }}</v-btn>
         </v-card>
     </v-dialog>
 </template>
