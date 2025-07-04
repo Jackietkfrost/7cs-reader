@@ -1,5 +1,11 @@
 import { defineStore } from "pinia"
 
+type Snackbar = {
+    visible: boolean
+    text: string
+    color: string
+}
+
 type AppState = {
     openedSettings: boolean
     fontSize: number
@@ -7,6 +13,7 @@ type AppState = {
     nightMode: boolean
     tagsVisible: boolean
     ratingsVisible: boolean
+    snackbar: Snackbar
     language: string
     isTTS: boolean
     fontFamily: string
@@ -21,6 +28,11 @@ export const useAppStore = defineStore("appStore", {
         nightMode: false,
         tagsVisible: true,
         ratingsVisible: true,
+        snackbar: {
+            visible: false,
+            text: "",
+            color: "info"
+        },
         language: "",
         isTTS: false,
         fontFamily: "",
@@ -70,6 +82,12 @@ export const useAppStore = defineStore("appStore", {
             window.sevenCsApi.invoke("msgGetFonts").then((fonts) => {
                 this.fonts = fonts
             })
+        },
+        addSnackbar(message: string, color: string) {
+            this.snackbar.visible = true
+            this.snackbar.text = message
+            this.snackbar.color = color
+            console.log("Adding snackbar, snackbar is visible: ", this.snackbar.visible)
         }
     }
 })
