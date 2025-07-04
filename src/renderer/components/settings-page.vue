@@ -110,11 +110,11 @@ const toggleNightMode = () => {
 }
 
 const toggleTags = () => {
-    appStore.setTagsVisible(!tagsVisible.value)
+    appStore.setTagsVisible(!appStore.tagsVisible)
 }
 
 const toggleRatings = () => {
-    appStore.setRatingsVisible(!ratingVisible.value)
+    appStore.setRatingsVisible(!appStore.ratingsVisible)
 }
 
 const changeFontFamily = () => {
