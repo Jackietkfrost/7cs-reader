@@ -19,6 +19,7 @@
                         @click="handleRoute('/reader')"
                     ></v-list-item>
                     <v-list-item
+                        v-if="appStore.tagsVisible"
                         prepend-icon="mdi-tag-outline"
                         :title="$t('ui-labels.nav-bar.labels')"
                         value="shared"
@@ -26,6 +27,7 @@
                         @click="handleRoute('/labels')"
                     ></v-list-item>
                     <v-list-item
+                        v-if="appStore.ratingsVisible"
                         prepend-icon="mdi-star-outline"
                         :title="$t('ui-labels.nav-bar.starred')"
                         value="starred"
