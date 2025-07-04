@@ -54,6 +54,7 @@
                                 class="exit-btn"
                                 flat
                                 value="library"
+                                @click="handleExit()"
                             ></v-list-item>
                         </v-list>
                     </div>
@@ -65,6 +66,15 @@
             </v-main>
         </v-layout>
         <SettingsPage />
+        <v-snackbar-queue
+            v-model="appStore.snackbar.text"
+            :timeout="5000"
+            :color="appStore.snackbar.color"
+            closable
+            location="top"
+            :timer="appStore.snackbar.color"
+            variant="tonal"
+        />
     </v-app>
 </template>
 
@@ -80,6 +90,7 @@ import SettingsPage from "../settings-page.vue"
 
 // const theme = useTheme()
 const bookStore = useBookStore()
+const appStore = useAppStore()
 const { bookName } = storeToRefs(bookStore)
 const { setOpenSettings } = useAppStore()
 const isBookSelected = ref(false)
@@ -101,6 +112,12 @@ const isCurrentRoute = (path: string): boolean => {
 
 const openSettings = (): void => {
     setOpenSettings(true)
+}
+
+const handleExit = (): void => {
+    // appStore.setExitApp(true)
+    appStore.addSnackbar("Exit", "error")
+    // console.log("Exit")
 }
 
 // const handleChangeTheme = (): void => {

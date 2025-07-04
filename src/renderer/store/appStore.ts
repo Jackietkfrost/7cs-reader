@@ -1,8 +1,7 @@
 import { defineStore } from "pinia"
 
-type Snackbar = {
-    visible: boolean
-    text: string
+type SnackbarQueue = {
+    text: string[]
     color: string
 }
 
@@ -13,7 +12,8 @@ type AppState = {
     nightMode: boolean
     tagsVisible: boolean
     ratingsVisible: boolean
-    snackbar: Snackbar
+    archivesVisible: boolean
+    snackbar: SnackbarQueue
     language: string
     isTTS: boolean
     fontFamily: string
@@ -28,9 +28,9 @@ export const useAppStore = defineStore("appStore", {
         nightMode: false,
         tagsVisible: true,
         ratingsVisible: true,
+        archivesVisible: false,
         snackbar: {
-            visible: false,
-            text: "",
+            text: [""],
             color: "info"
         },
         language: "",
@@ -83,11 +83,12 @@ export const useAppStore = defineStore("appStore", {
                 this.fonts = fonts
             })
         },
+        setVisibleArchives(visible: boolean) {
+            this.archivesVisible = visible
+        },
         addSnackbar(message: string, color: string) {
-            this.snackbar.visible = true
-            this.snackbar.text = message
+            this.snackbar.text.push(message)
             this.snackbar.color = color
-            console.log("Adding snackbar, snackbar is visible: ", this.snackbar.visible)
         }
     }
 })
