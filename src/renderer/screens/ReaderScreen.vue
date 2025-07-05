@@ -15,7 +15,7 @@
 </template>
 <script setup lang="ts">
 import { Rendition } from "epubjs"
-import { watch } from "vue"
+import { ref, watch } from "vue"
 import { VueReader } from "vue-reader"
 import { useTheme } from "vuetify"
 import { useBookStore } from "../store/bookStore"
@@ -29,7 +29,7 @@ let rendition: Rendition
 const updateTheme = (rendition) => {
     // const themes = rendition.themes
 }
-
+const themeMode = ref(theme.global.name.value)
 const getRendition = (_rendition: Rendition) => {
     rendition = _rendition
     updateTheme(_rendition)
@@ -79,8 +79,7 @@ const getRendition = (_rendition: Rendition) => {
             "background-color": "red"
         }
     })
-    rendition.themes.select(theme.global.name.value)
-    console.log("Themes", rendition.themes)
+    rendition.themes.select(themeMode.value)
 }
 watch(theme.current, () => {
     if (rendition) {
