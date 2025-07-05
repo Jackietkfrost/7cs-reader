@@ -131,6 +131,9 @@ const handleAddBook = async () => {
     const dialogResult = await addBook("epub")
     if (!dialogResult.canceled) {
         getBooks()
+        showSnackbar("Added New Book!", "success")
+    } else {
+        showSnackbar("Operation canceled", "error")
     }
 }
 
@@ -167,6 +170,7 @@ const showSnackbar = (message: string, type: string): void => {
     snackText.value = message
     snackbar.value = true
     const colorMap = {
+        success: theme.current.value.colors.success,
         error: theme.current.value.colors.error,
         info: theme.current.value.colors.info,
         warning: theme.current.value.colors.warning
