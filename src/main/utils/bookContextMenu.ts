@@ -24,6 +24,13 @@ contextMenu.append(new MenuItem({ type: "separator" }))
 
 contextMenu.append(
     new MenuItem({
+        label: "Rename",
+        click: () => console.log("Rename clicked")
+    })
+)
+
+contextMenu.append(
+    new MenuItem({
         label: "Edit Tags...",
         click: () => console.log("Edit clicked")
     })
@@ -98,7 +105,6 @@ export function popupContextMenu() {
 async function deleteBook(book: string) {
     // assuming bookFile is defined somewhere
     const bookPath = path.join(Constants.BOOK_FOLDER + "\\" + book)
-    console.log(`Path: ${bookPath}`)
     try {
         await fs.unlink(bookPath)
         console.log("Book deleted")
