@@ -3,7 +3,7 @@ import { ko, en, zhHans, zhHant, de, es, ja, fr, ru, pt, nl } from "vuetify/loca
 import { aliases, mdi } from "vuetify/iconsets/mdi"
 import "vuetify/styles"
 import "@mdi/font/css/materialdesignicons.min.css"
-
+//  @ts-expect-error This is a valid import..
 import colors from "vuetify/lib/util/colors.mjs"
 
 export default createVuetify({
