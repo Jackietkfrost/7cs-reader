@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="isSettingsOpened" transition="dialog-bottom-transition" scrim="secondary" cl>
+    <v-dialog v-model="isSettingsOpened" transition="dialog-bottom-transition" :scrim="false" cl>
         <v-card>
             <v-card-title class="mx-3">Settings</v-card-title>
             <v-card-text>
