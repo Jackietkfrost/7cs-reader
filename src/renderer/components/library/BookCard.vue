@@ -1,39 +1,62 @@
 <template>
-    <v-card :id="book" class="book-card" variant="text" :height="cardHeight">
-        <vue-reader
-            v-show="false"
-            :url="`../epubs/${book}`"
-            :get-rendition="getRendition"
-        ></vue-reader>
-        <v-img
-            v-if="information"
-            :src="information.cover ?? 'https://via.placeholder.com/500x600'"
-            :alt="information.title"
-            style="width: 500px; height: 250px; object-fit: cover"
-        />
-        <v-card-title class="text-wrap">
-            <h4>{{ book.replace(".epub", "") }}</h4>
-        </v-card-title>
-        <v-card-subtitle>{{ information?.creator ?? "Author Name" }}</v-card-subtitle>
-        <v-card-text>
-            <slot name="content"></slot>
-        </v-card-text>
-        <v-card-actions>
-            <slot name="actions"></slot>
-        </v-card-actions>
-    </v-card>
+    <!-- <v-tooltip :text="formattedBookInfo(information)">
+        <template #activator="{ props: tooltipProps }"> -->
+    <v-hover v-slot="{ isHovering, props: hoverProps }">
+        <v-card
+            v-bind="hoverProps"
+            :id="props.book"
+            class="book-card"
+            variant="text"
+            :height="cardHeight"
+        >
+            <vue-reader
+                v-show="false"
+                :url="`../epubs/${book}`"
+                :get-rendition="getRendition"
+            ></vue-reader>
+            <v-img
+                v-if="information"
+                :src="information.cover ?? 'https://via.placeholder.com/500x600'"
+                :alt="information.title"
+                style="width: 500px; height: 250px; object-fit: cover"
+            />
+            <v-card-title class="text-wrap">
+                <h4 class="book-title">{{ book.replace(".*", "") }}</h4>
+            </v-card-title>
+
+            <v-card-subtitle>{{ information?.creator ?? "Author Name" }}</v-card-subtitle>
+            <v-card-text>
+                <slot name="content"></slot>
+            </v-card-text>
+            <v-card-actions>
+                <slot name="actions"></slot>
+            </v-card-actions>
+        </v-card>
+        <book-tooltip
+            :information="information ? information : {}"
+            :model-value="isHovering"
+            absolute
+        ></book-tooltip>
+    </v-hover>
+    <!-- </template>
+    </v-tooltip> -->
 </template>
 <script setup lang="ts">
 import { VueReader } from "vue-reader"
 import { ref } from "vue"
 import { Rendition } from "epubjs"
 import { useTheme } from "vuetify"
+import type { BookMetaData } from "@/main/types/book"
+import BookTooltip from "./BookTooltip.vue"
 
 const theme = useTheme()
 const cardHeight = theme.current.value.variables["card-height"]
-const information = ref()
+const information = ref<BookMetaData>()
 const props = defineProps<{ book: string; bookPath: string }>()
-const { book } = props
+
+// const formattedBookInfo = (info: Book | undefined): string => {
+//     return `Title: ${info?.title ?? "No Title Provided"} \n Author: ${info?.creator ?? "No Author Provided"} \n${info?.description ?? "No Description Provided"}`
+// }
 
 const getRendition = (rendition: Rendition) => {
     const book = rendition.book
