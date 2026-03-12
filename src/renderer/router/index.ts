@@ -32,13 +32,13 @@ export default createRouter({
                 titleKey: "title.starred"
             }
         },
-        {
-            path: "/archive",
-            component: () => import("@/renderer/screens/ArchiveScreen.vue"),
-            meta: {
-                titleKey: "title.archive"
-            }
-        },
+        // {
+        //     path: "/archive",
+        //     component: () => import("@/renderer/screens/ArchiveScreen.vue"),
+        //     meta: {
+        //         titleKey: "title.archive"
+        //     }
+        // },
         {
             path: "/error",
             component: () => import("@/renderer/screens/ErrorScreen.vue"),
