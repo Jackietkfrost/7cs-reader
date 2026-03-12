@@ -1,6 +1,6 @@
-import { ipcMain, IpcMainEvent, dialog, Menu, MenuItem, webContents, shell } from "electron"
+import { ipcMain, IpcMainEvent, dialog, Menu, MenuItem, webContents, shell, app } from "electron"
 import Constants from "./utils/Constants"
-import { promises as fs } from "fs"
+import * as fs from "fs"
 import * as path from "path"
 import { getFonts } from "font-list"
 
@@ -47,6 +47,7 @@ export default class IPCs {
                 filters.push({ name: "Zip", extensions: ["zip"] })
             } else if (filter === "epub") {
                 filters.push({ name: "Epub", extensions: ["epub", "zip"] })
+                console.log()
             }
 
             const dialogResult = await dialog.showOpenDialog({
@@ -54,11 +55,17 @@ export default class IPCs {
                 filters
             })
 
+            console.log(dialogResult)
+
             if (!dialogResult.canceled) {
                 const source = dialogResult.filePaths[0]
 
+                // const testPath = app.getPath
                 const destinationPath = path.join(Constants.BOOK_FOLDER, path.basename(source))
-                await fs.copyFile(source, destinationPath)
+                if (!fs.existsSync(path.dirname(destinationPath))) {
+                    await fs.promises.mkdir(path.dirname(destinationPath), { recursive: true })
+                }
+                await fs.promises.copyFile(source, destinationPath)
                 return destinationPath
             }
 
@@ -169,7 +176,7 @@ export default class IPCs {
             const bookPath = path.join(Constants.BOOK_FOLDER + "\\" + book)
             console.log(`Path: ${bookPath}`)
             try {
-                await fs.unlink(bookPath)
+                await fs.promises.unlink(bookPath)
                 console.log("Book deleted")
                 webContents
                     .getFocusedWebContents()
@@ -180,7 +187,7 @@ export default class IPCs {
         }
         async function getBooks() {
             const bookPath = Constants.BOOK_FOLDER
-            const files = await fs.readdir(bookPath)
+            const files = await fs.promises.readdir(bookPath)
             const books = files.filter((file) => file.endsWith(".epub"))
             return books
         }
