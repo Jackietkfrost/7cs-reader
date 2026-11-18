@@ -30,16 +30,14 @@
             {{ snackText }}
         </v-snackbar>
 
-        <v-row v-if="viewMode === 'gallery'" no-gutters class="text-center" data-testid="library-gallery-view">
+        <v-row
+            v-if="viewMode === 'gallery'"
+            no-gutters
+            class="text-center"
+            data-testid="library-gallery-view"
+        >
             <v-row class="my-2 w-100">
-                <v-col
-                    v-for="book in books"
-                    :key="sanitizeKey(book)"
-                    cols="6"
-                    sm="4"
-                    md="3"
-                    lg="2"
-                >
+                <v-col v-for="book in books" :key="sanitizeKey(book)" cols="6" sm="4" md="3" lg="2">
                     <book-card
                         :book="book"
                         :book-path="bookPath"

@@ -1,7 +1,7 @@
 {
     "name": "7cs-reader",
     "appId": "com.vutron.vutron",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "Electron Epub Reader",
     "homepage": "https://www.am-x2.com",
     "author": "Jacquelinne Marcano <contact@am-x2.com>",
@@ -10,10 +10,10 @@
     "private": true,
     "repository": {
         "type": "git",
-        "url": "https://github.com/jooy2/vutron.git"
+        "url": "https://github.com/Jackietkfrost/7cs-reader.git"
     },
     "bugs": {
-        "url": "https://github.com/jooy2/vutron/issues"
+        "url": "https://github.com/Jackietkfrost/7cs-reader/issues"
     },
     "scripts": {
         "dev": "vite",

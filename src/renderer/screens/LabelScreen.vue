@@ -2,216 +2,387 @@
     <v-container class="py-8 px-6 screen-container fill-height align-start">
         <v-row class="mb-6 w-100">
             <v-col cols="12">
-                <v-card
-                    class="header-card rounded px-6 py-6 d-flex flex-wrap align-center justify-space-between ga-4"
-                >
-                    <div class="d-flex align-center">
-                        <v-avatar size="64" color="teal-lighten-4" class="mr-4 elevation-2">
-                            <v-icon size="36" color="teal-darken-2" aria-hidden="true">
-                                mdi-tag-multiple
-                            </v-icon>
-                        </v-avatar>
-                        <div>
-                            <h1 class="text-h4 font-weight-black mb-1">
-                                Categories &amp; Shelves
-                            </h1>
-                            <p class="text-subtitle-1 text-medium-emphasis mb-0">
-                                Browse your library grouped by tags and genres
-                            </p>
-                        </div>
+                <v-card class="header-card rounded px-6 py-6 d-flex align-center">
+                    <v-avatar size="64" color="teal-lighten-4" class="mr-4 elevation-2">
+                        <v-icon size="36" color="teal-darken-2" aria-hidden="true">
+                            mdi-tag-multiple
+                        </v-icon>
+                    </v-avatar>
+                    <div>
+                        <h1 class="text-h4 font-weight-black mb-1"> Categories &amp; Shelves </h1>
+                        <p class="text-subtitle-1 text-medium-emphasis mb-0">
+                            Browse and organize your books by tags and genres
+                        </p>
                     </div>
-                    <ViewModeToggle v-model="viewMode" />
                 </v-card>
+            </v-col>
+        </v-row>
+
+        <v-row class="mb-6 w-100 align-center">
+            <v-col cols="12" md="4">
+                <v-text-field
+                    v-model="search"
+                    prepend-inner-icon="mdi-magnify"
+                    placeholder="Search books by title, author, or tag..."
+                    aria-label="Search books by title, author, or tag"
+                    variant="outlined"
+                    density="comfortable"
+                    hide-details
+                    clearable
+                    data-testid="labeled-search-input"
+                />
+            </v-col>
+            <v-col cols="6" sm="4" md="3">
+                <v-select
+                    v-model="selectedCategory"
+                    :items="categoryFilterOptions"
+                    item-title="title"
+                    item-value="value"
+                    label="Filter Category"
+                    variant="outlined"
+                    density="comfortable"
+                    hide-details
+                    data-testid="labeled-filter-select"
+                />
+            </v-col>
+            <v-col cols="6" sm="4" md="3">
+                <v-select
+                    v-model="sortBy"
+                    :items="sortOptions"
+                    item-title="title"
+                    item-value="value"
+                    label="Sort Books"
+                    variant="outlined"
+                    density="comfortable"
+                    hide-details
+                    data-testid="labeled-sort-select"
+                />
+            </v-col>
+            <v-col cols="12" sm="4" md="2" class="d-flex justify-end">
+                <ViewModeToggle v-model="viewMode" />
             </v-col>
         </v-row>
 
         <v-row class="w-100 flex-grow-1">
             <v-col cols="12" class="px-0">
-                <template v-if="categorizedGroups.length > 0">
-                    <div
-                        v-for="group in categorizedGroups"
-                        :key="group.name"
-                        class="shelf-container mb-8 px-3"
-                    >
-                        <div class="d-flex align-center mb-3">
-                            <v-icon color="primary" class="mr-2" size="20" aria-hidden="true">
-                                {{
-                                    group.name === "Uncategorized"
-                                        ? "mdi-tag-off-outline"
-                                        : "mdi-folder-open-outline"
-                                }}
-                            </v-icon>
-                            <h2 class="text-h6 font-weight-bold mb-0">
-                                {{ group.name }}
-                            </h2>
-                            <v-chip
-                                size="x-small"
-                                color="primary"
-                                variant="tonal"
-                                rounded
-                                class="ml-3 px-2 font-weight-bold"
-                            >
-                                {{ group.books.length }}
-                                {{ group.books.length === 1 ? "book" : "books" }}
-                            </v-chip>
-                        </div>
-
-                        <div
+                <template v-if="books.length > 0">
+                    <template v-if="filteredBooks.length > 0">
+                        <!-- Gallery View -->
+                        <v-row
                             v-if="viewMode === 'gallery'"
-                            class="horizontal-scroll-row py-2 d-flex"
+                            class="pt-2 w-100"
                             data-testid="labeled-gallery-view"
                         >
-                            <v-card
-                                v-for="book in group.books"
+                            <v-col
+                                v-for="book in filteredBooks"
                                 :key="book.filename"
-                                variant="outlined"
-                                class="shelf-book-card mr-4 rounded flex-shrink-0 relative overflow-hidden"
-                                width="180"
-                                height="290"
+                                cols="6"
+                                sm="4"
+                                md="3"
+                                lg="2"
+                                xl="2"
+                                class="d-flex justify-center mb-4"
                             >
-                                <v-hover v-slot="{ isHovering, props: hoverProps }">
-                                    <div v-bind="hoverProps" class="fill-height d-flex flex-column">
+                                <v-card
+                                    class="labeled-card rounded overflow-hidden d-flex flex-column h-100"
+                                    style="max-width: 220px; width: 100%"
+                                    variant="outlined"
+                                    :data-testid="`labeled-book-card-${book.filename}`"
+                                    :data-book-filename="book.filename"
+                                >
+                                    <vue-reader
+                                        v-if="!bookStore.infoCache[book.filename]?.isMetadataLoaded"
+                                        v-show="false"
+                                        :url="`./epubs/${book.filename}`"
+                                        :get-rendition="(r) => handleRendition(book.filename, r)"
+                                    />
+
+                                    <div
+                                        class="cover-container cover-clickable w-100"
+                                        role="button"
+                                        tabindex="0"
+                                        :aria-label="`Open ${book.title}`"
+                                        style="height: 220px; overflow: hidden"
+                                        @click="handleOpenBook(book.filename)"
+                                        @keydown.enter="handleOpenBook(book.filename)"
+                                        @keydown.space.prevent="handleOpenBook(book.filename)"
+                                    >
+                                        <v-skeleton-loader
+                                            v-if="
+                                                !bookStore.covers[book.filename] &&
+                                                !noCovers[book.filename]
+                                            "
+                                            type="image"
+                                            height="220"
+                                            class="w-100 fill-height"
+                                        />
+                                        <v-img
+                                            v-else-if="bookStore.covers[book.filename]"
+                                            :src="bookStore.covers[book.filename]"
+                                            :alt="book.title"
+                                            cover
+                                            class="align-end fill-height"
+                                            style="
+                                                aspect-ratio: 2 / 3;
+                                                object-fit: cover;
+                                                object-position: top center;
+                                            "
+                                        />
                                         <div
-                                            class="cover-container relative flex-grow-1"
-                                            style="height: 180px; overflow: hidden"
+                                            v-else
+                                            class="empty-cover d-flex align-center justify-center fill-height"
+                                            style="aspect-ratio: 2 / 3"
                                         >
-                                            <v-skeleton-loader
-                                                v-if="
-                                                    !bookStore.covers[book.filename] &&
-                                                    !noCovers[book.filename]
-                                                "
-                                                type="image"
-                                                height="180"
-                                                class="w-100 fill-height"
-                                            />
-                                            <v-img
-                                                v-else-if="bookStore.covers[book.filename]"
-                                                :src="bookStore.covers[book.filename]"
-                                                :alt="book.title"
-                                                height="180"
-                                                cover
-                                            />
-                                            <div
-                                                v-else
-                                                class="empty-cover d-flex align-center justify-center fill-height"
-                                            >
-                                                <v-icon size="40">
-                                                    mdi-book-open-blank-variant
-                                                </v-icon>
-                                            </div>
-
-                                            <v-fade-transition>
-                                                <div
-                                                    v-if="isHovering"
-                                                    class="hover-overlay d-flex flex-column align-center justify-center"
-                                                >
-                                                    <v-btn
-                                                        color="primary"
-                                                        size="small"
-                                                        prepend-icon="mdi-book-open-page-variant"
-                                                        class="mb-2 rounded font-weight-bold"
-                                                        width="110"
-                                                        @click="handleOpenBook(book.filename)"
-                                                    >
-                                                        Read
-                                                    </v-btn>
-                                                    <v-btn
-                                                        color="white"
-                                                        variant="outlined"
-                                                        size="small"
-                                                        prepend-icon="mdi-pencil"
-                                                        class="rounded font-weight-bold"
-                                                        width="110"
-                                                        @click="openEditDialog(book.filename)"
-                                                    >
-                                                        Edit
-                                                    </v-btn>
-                                                </div>
-                                            </v-fade-transition>
+                                            <v-icon size="48"> mdi-book-open-blank-variant </v-icon>
                                         </div>
-
-                                        <div class="px-2 pt-1 pb-1 progress-strip">
-                                            <div
-                                                class="d-flex align-center justify-space-between text-caption text-medium-emphasis mb-1 font-weight-medium"
-                                            >
-                                                <span
-                                                    class="d-flex align-center font-weight-bold text-primary"
-                                                    style="font-size: 0.7rem"
-                                                >
-                                                    <v-icon
-                                                        size="11"
-                                                        color="primary"
-                                                        class="mr-1"
-                                                        aria-hidden="true"
-                                                    >
-                                                        mdi-book-open-page-variant
-                                                    </v-icon>
-                                                    {{ getProgressPercent(book.filename) }}%
-                                                </span>
-                                                <span
-                                                    class="text-caption text-medium-emphasis"
-                                                    style="font-size: 0.68rem"
-                                                >
-                                                    {{ getPageProgressText(book.filename) }}
-                                                </span>
-                                            </div>
-                                            <v-progress-linear
-                                                :model-value="getProgressPercent(book.filename)"
-                                                color="primary"
-                                                height="4"
-                                                rounded
-                                            />
-                                        </div>
-
-                                        <v-card-text
-                                            class="pt-2 pb-2 px-3 flex-shrink-0 d-flex flex-column justify-space-between"
-                                            style="height: 110px"
-                                        >
-                                            <div>
-                                                <h4
-                                                    class="book-title text-caption font-weight-bold text-truncate-2 mb-1"
-                                                >
-                                                    {{ book.title }}
-                                                </h4>
-                                            </div>
-                                            <div v-if="book.rating > 0" class="d-flex align-center">
-                                                <v-rating
-                                                    :model-value="book.rating"
-                                                    color="amber"
-                                                    active-color="amber"
-                                                    density="compact"
-                                                    size="x-small"
-                                                    readonly
-                                                />
-                                                <span
-                                                    class="text-caption text-amber ml-1 font-weight-bold"
-                                                >
-                                                    ({{ book.rating }})
-                                                </span>
-                                            </div>
-                                            <div v-else class="text-caption text-medium-emphasis">
-                                                Unrated
-                                            </div>
-                                        </v-card-text>
                                     </div>
-                                </v-hover>
-                            </v-card>
-                        </div>
 
+                                    <div class="px-3 pt-2 pb-1 progress-strip">
+                                        <div
+                                            class="d-flex align-center justify-space-between text-caption text-medium-emphasis mb-1 font-weight-medium"
+                                        >
+                                            <span
+                                                class="d-flex align-center font-weight-bold text-primary"
+                                            >
+                                                <v-icon
+                                                    size="12"
+                                                    color="primary"
+                                                    class="mr-1"
+                                                    aria-hidden="true"
+                                                >
+                                                    mdi-book-open-page-variant
+                                                </v-icon>
+                                                {{ book.progress }}%
+                                            </span>
+                                            <span class="text-caption text-medium-emphasis">
+                                                {{ getPageProgressText(book.filename) }}
+                                            </span>
+                                        </div>
+                                        <v-progress-linear
+                                            :model-value="book.progress"
+                                            color="primary"
+                                            height="5"
+                                            rounded
+                                        />
+                                    </div>
+
+                                    <v-card-text
+                                        class="pt-3 pb-3 px-3 d-flex flex-column justify-space-between flex-grow-1"
+                                    >
+                                        <div
+                                            class="title-clickable mb-2"
+                                            role="button"
+                                            tabindex="0"
+                                            :aria-label="`Read ${book.title}`"
+                                            @click="handleOpenBook(book.filename)"
+                                            @keydown.enter="handleOpenBook(book.filename)"
+                                            @keydown.space.prevent="handleOpenBook(book.filename)"
+                                        >
+                                            <h3
+                                                class="text-subtitle-2 font-weight-bold text-truncate mb-1"
+                                            >
+                                                {{ book.title }}
+                                            </h3>
+                                            <p
+                                                class="text-caption text-medium-emphasis text-truncate mb-0"
+                                            >
+                                                {{ book.creator }}
+                                            </p>
+                                        </div>
+
+                                        <div
+                                            class="d-flex align-center justify-space-between mb-2"
+                                            @click.stop
+                                        >
+                                            <v-rating
+                                                :model-value="book.rating"
+                                                color="amber"
+                                                active-color="amber"
+                                                density="compact"
+                                                size="small"
+                                                hover
+                                                clearable
+                                                :item-aria-label="`Rate ${book.title} {0} out of {1} stars`"
+                                                :data-testid="`inline-rating-${book.filename}`"
+                                                @update:model-value="
+                                                    (val) =>
+                                                        handleInlineRate(
+                                                            book.filename,
+                                                            book.title,
+                                                            Number(val) || 0
+                                                        )
+                                                "
+                                            />
+                                            <span
+                                                class="text-caption font-weight-bold"
+                                                :class="
+                                                    book.rating > 0
+                                                        ? 'text-amber'
+                                                        : 'text-medium-emphasis'
+                                                "
+                                            >
+                                                {{
+                                                    book.rating > 0 ? `${book.rating}.0` : "Unrated"
+                                                }}
+                                            </span>
+                                        </div>
+
+                                        <div
+                                            class="category-capsules d-flex flex-wrap align-center ga-1 pt-1"
+                                            @click.stop
+                                        >
+                                            <v-chip
+                                                v-for="cat in book.categories"
+                                                :key="cat"
+                                                size="x-small"
+                                                variant="tonal"
+                                                color="primary"
+                                                rounded
+                                                closable
+                                                :data-testid="`category-chip-${book.filename}-${cat}`"
+                                                :aria-label="`Remove category ${cat} from ${book.title}`"
+                                                @click:close.stop="
+                                                    handleRemoveCategory(
+                                                        book.filename,
+                                                        cat,
+                                                        book.title
+                                                    )
+                                                "
+                                            >
+                                                {{ cat }}
+                                            </v-chip>
+
+                                            <v-menu
+                                                v-model="activeAddMenu[book.filename]"
+                                                :close-on-content-click="false"
+                                                location="bottom start"
+                                            >
+                                                <template #activator="{ props: menuProps }">
+                                                    <v-chip
+                                                        v-bind="menuProps"
+                                                        size="x-small"
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        rounded
+                                                        class="add-tag-chip font-weight-bold"
+                                                        :data-testid="`add-category-chip-${book.filename}`"
+                                                        :aria-label="`Add category to ${book.title}`"
+                                                    >
+                                                        <v-icon size="13" icon="mdi-plus" />
+                                                    </v-chip>
+                                                </template>
+                                                <v-card
+                                                    class="pa-3 rounded add-category-popover"
+                                                    min-width="260"
+                                                    max-width="320"
+                                                    variant="elevated"
+                                                >
+                                                    <div
+                                                        class="text-caption font-weight-bold mb-2 d-flex align-center justify-space-between"
+                                                    >
+                                                        <span>Add Category</span>
+                                                        <v-btn
+                                                            size="x-small"
+                                                            variant="text"
+                                                            icon="mdi-close"
+                                                            aria-label="Close"
+                                                            @click="
+                                                                activeAddMenu[book.filename] = false
+                                                            "
+                                                        />
+                                                    </div>
+                                                    <v-text-field
+                                                        v-model="newCategoryInputs[book.filename]"
+                                                        placeholder="Type category..."
+                                                        density="compact"
+                                                        variant="outlined"
+                                                        hide-details
+                                                        autofocus
+                                                        append-inner-icon="mdi-plus-circle"
+                                                        :data-testid="`input-add-category-${book.filename}`"
+                                                        @keydown.enter="
+                                                            handleSaveTypedCategory(
+                                                                book.filename,
+                                                                book.title
+                                                            )
+                                                        "
+                                                        @click:append-inner="
+                                                            handleSaveTypedCategory(
+                                                                book.filename,
+                                                                book.title
+                                                            )
+                                                        "
+                                                    />
+                                                    <template
+                                                        v-if="
+                                                            getAvailableCategoriesForBook(
+                                                                book.filename
+                                                            ).length > 0
+                                                        "
+                                                    >
+                                                        <div
+                                                            class="text-caption text-medium-emphasis mt-3 mb-1"
+                                                        >
+                                                            Select existing:
+                                                        </div>
+                                                        <div
+                                                            class="d-flex flex-wrap ga-1 existing-categories-scroll"
+                                                        >
+                                                            <v-chip
+                                                                v-for="existingCat in getAvailableCategoriesForBook(
+                                                                    book.filename
+                                                                )"
+                                                                :key="existingCat"
+                                                                size="x-small"
+                                                                variant="outlined"
+                                                                color="primary"
+                                                                rounded
+                                                                class="clickable"
+                                                                :data-testid="`select-category-option-${book.filename}-${existingCat}`"
+                                                                @click="
+                                                                    handleSelectExistingCategory(
+                                                                        book.filename,
+                                                                        existingCat,
+                                                                        book.title
+                                                                    )
+                                                                "
+                                                            >
+                                                                {{ existingCat }}
+                                                            </v-chip>
+                                                        </div>
+                                                    </template>
+                                                </v-card>
+                                            </v-menu>
+                                        </div>
+                                    </v-card-text>
+                                </v-card>
+                            </v-col>
+                        </v-row>
+
+                        <!-- List View -->
                         <div
                             v-else
-                            class="d-flex flex-column ga-2 py-2"
+                            class="d-flex flex-column ga-2 w-100"
                             data-testid="labeled-list-view"
                         >
                             <v-card
-                                v-for="book in group.books"
+                                v-for="book in filteredBooks"
                                 :key="book.filename"
                                 variant="outlined"
                                 rounded
-                                class="shelf-list-item px-4 py-3 d-flex align-center ga-4"
+                                class="labeled-list-item px-4 py-3 d-flex align-center ga-4 flex-wrap flex-md-nowrap"
+                                :data-testid="`labeled-book-row-${book.filename}`"
+                                :data-book-filename="book.filename"
                             >
+                                <vue-reader
+                                    v-if="!bookStore.infoCache[book.filename]?.isMetadataLoaded"
+                                    v-show="false"
+                                    :url="`./epubs/${book.filename}`"
+                                    :get-rendition="(r) => handleRendition(book.filename, r)"
+                                />
+
                                 <div
-                                    class="list-thumb rounded overflow-hidden flex-shrink-0 clickable"
+                                    class="list-thumb rounded overflow-hidden flex-shrink-0 cover-clickable"
                                     role="button"
                                     tabindex="0"
                                     :aria-label="`Open ${book.title}`"
@@ -236,7 +407,8 @@
                                 </div>
 
                                 <div
-                                    class="flex-grow-1 min-w-0 clickable"
+                                    class="flex-grow-1 min-w-0 title-clickable"
+                                    style="min-width: 180px"
                                     role="button"
                                     tabindex="0"
                                     :aria-label="`Read ${book.title}`"
@@ -253,60 +425,212 @@
                                 </div>
 
                                 <div
+                                    class="category-capsules-list d-flex flex-wrap align-center ga-1 my-1 flex-grow-1"
+                                    style="max-width: 380px"
+                                    @click.stop
+                                >
+                                    <v-chip
+                                        v-for="cat in book.categories"
+                                        :key="cat"
+                                        size="x-small"
+                                        variant="tonal"
+                                        color="primary"
+                                        rounded
+                                        closable
+                                        :data-testid="`list-category-chip-${book.filename}-${cat}`"
+                                        :aria-label="`Remove category ${cat} from ${book.title}`"
+                                        @click:close.stop="
+                                            handleRemoveCategory(book.filename, cat, book.title)
+                                        "
+                                    >
+                                        {{ cat }}
+                                    </v-chip>
+
+                                    <v-menu
+                                        v-model="activeAddMenuList[book.filename]"
+                                        :close-on-content-click="false"
+                                        location="bottom start"
+                                    >
+                                        <template #activator="{ props: menuProps }">
+                                            <v-chip
+                                                v-bind="menuProps"
+                                                size="x-small"
+                                                variant="outlined"
+                                                color="primary"
+                                                rounded
+                                                class="add-tag-chip font-weight-bold"
+                                                :data-testid="`list-add-category-chip-${book.filename}`"
+                                                :aria-label="`Add category to ${book.title}`"
+                                            >
+                                                <v-icon size="13" icon="mdi-plus" />
+                                            </v-chip>
+                                        </template>
+                                        <v-card
+                                            class="pa-3 rounded add-category-popover"
+                                            min-width="260"
+                                            max-width="320"
+                                            variant="elevated"
+                                        >
+                                            <div
+                                                class="text-caption font-weight-bold mb-2 d-flex align-center justify-space-between"
+                                            >
+                                                <span>Add Category</span>
+                                                <v-btn
+                                                    size="x-small"
+                                                    variant="text"
+                                                    icon="mdi-close"
+                                                    aria-label="Close"
+                                                    @click="
+                                                        activeAddMenuList[book.filename] = false
+                                                    "
+                                                />
+                                            </div>
+                                            <v-text-field
+                                                v-model="newCategoryInputs[book.filename]"
+                                                placeholder="Type category..."
+                                                density="compact"
+                                                variant="outlined"
+                                                hide-details
+                                                autofocus
+                                                append-inner-icon="mdi-plus-circle"
+                                                :data-testid="`list-input-add-category-${book.filename}`"
+                                                @keydown.enter="
+                                                    handleSaveTypedCategory(
+                                                        book.filename,
+                                                        book.title,
+                                                        true
+                                                    )
+                                                "
+                                                @click:append-inner="
+                                                    handleSaveTypedCategory(
+                                                        book.filename,
+                                                        book.title,
+                                                        true
+                                                    )
+                                                "
+                                            />
+                                            <template
+                                                v-if="
+                                                    getAvailableCategoriesForBook(book.filename)
+                                                        .length > 0
+                                                "
+                                            >
+                                                <div
+                                                    class="text-caption text-medium-emphasis mt-3 mb-1"
+                                                >
+                                                    Select existing:
+                                                </div>
+                                                <div
+                                                    class="d-flex flex-wrap ga-1 existing-categories-scroll"
+                                                >
+                                                    <v-chip
+                                                        v-for="existingCat in getAvailableCategoriesForBook(
+                                                            book.filename
+                                                        )"
+                                                        :key="existingCat"
+                                                        size="x-small"
+                                                        variant="outlined"
+                                                        color="primary"
+                                                        rounded
+                                                        class="clickable"
+                                                        :data-testid="`list-select-category-option-${book.filename}-${existingCat}`"
+                                                        @click="
+                                                            handleSelectExistingCategory(
+                                                                book.filename,
+                                                                existingCat,
+                                                                book.title,
+                                                                true
+                                                            )
+                                                        "
+                                                    >
+                                                        {{ existingCat }}
+                                                    </v-chip>
+                                                </div>
+                                            </template>
+                                        </v-card>
+                                    </v-menu>
+                                </div>
+
+                                <div
                                     class="d-none d-md-flex align-center ga-2"
                                     style="min-width: 140px"
                                 >
                                     <v-progress-linear
-                                        :model-value="getProgressPercent(book.filename)"
+                                        :model-value="book.progress"
                                         color="primary"
                                         height="5"
                                         rounded
                                         style="width: 72px"
                                     />
                                     <span class="text-caption text-medium-emphasis">
-                                        {{ getProgressPercent(book.filename) }}%
+                                        {{ book.progress }}%
                                     </span>
                                 </div>
 
                                 <div
-                                    v-if="book.rating > 0"
-                                    class="d-none d-sm-flex align-center"
+                                    class="d-none d-sm-flex align-center ga-2 flex-shrink-0"
+                                    @click.stop
                                 >
                                     <v-rating
                                         :model-value="book.rating"
                                         color="amber"
                                         active-color="amber"
                                         density="compact"
-                                        size="x-small"
-                                        readonly
+                                        size="small"
+                                        hover
+                                        clearable
+                                        :item-aria-label="`Rate ${book.title} {0} out of {1} stars`"
+                                        :data-testid="`list-inline-rating-${book.filename}`"
+                                        @update:model-value="
+                                            (val) =>
+                                                handleInlineRate(
+                                                    book.filename,
+                                                    book.title,
+                                                    Number(val) || 0
+                                                )
+                                        "
                                     />
+                                    <span
+                                        class="text-caption font-weight-bold"
+                                        style="min-width: 48px; text-align: right"
+                                        :class="
+                                            book.rating > 0 ? 'text-amber' : 'text-medium-emphasis'
+                                        "
+                                    >
+                                        {{ book.rating > 0 ? `${book.rating}.0` : "Unrated" }}
+                                    </span>
                                 </div>
 
                                 <div class="d-flex align-center ga-1 flex-shrink-0">
                                     <v-btn
                                         size="small"
                                         variant="text"
+                                        color="primary"
                                         prepend-icon="mdi-book-open-page-variant"
                                         @click="handleOpenBook(book.filename)"
                                     >
                                         Read
                                     </v-btn>
-                                    <v-btn
-                                        size="small"
-                                        variant="outlined"
-                                        rounded
-                                        prepend-icon="mdi-pencil"
-                                        @click="openEditDialog(book.filename)"
-                                    >
-                                        Edit
-                                    </v-btn>
                                 </div>
                             </v-card>
                         </div>
+                    </template>
+
+                    <div v-else class="text-center py-12 w-100">
+                        <v-icon size="64" color="medium-emphasis" class="mb-3">
+                            mdi-magnify-remove-outline
+                        </v-icon>
+                        <h3 class="text-h6 font-weight-bold">No Matching Books</h3>
+                        <p class="text-body-2 text-medium-emphasis mb-4">
+                            No books found matching your search or category filter.
+                        </p>
+                        <v-btn variant="outlined" color="primary" rounded @click="resetFilters">
+                            Clear Filters
+                        </v-btn>
                     </div>
                 </template>
 
-                <div v-else class="text-center py-12">
+                <div v-else class="text-center py-12 w-100">
                     <v-icon size="80" color="medium-emphasis" class="mb-4">
                         mdi-tag-off-outline
                     </v-icon>
@@ -317,22 +641,6 @@
                 </div>
             </v-col>
         </v-row>
-
-        <div v-show="false">
-            <template v-for="book in books" :key="book">
-                <vue-reader
-                    v-if="!bookStore.infoCache[book]?.isMetadataLoaded"
-                    :url="`./epubs/${book}`"
-                    :get-rendition="(rendition) => handleRendition(book, rendition)"
-                />
-            </template>
-        </div>
-
-        <BookMetadataDialog
-            v-model="showEditDialog"
-            :book-name="editingBook"
-            @saved="onMetadataSaved"
-        />
     </v-container>
 </template>
 
@@ -343,9 +651,17 @@ import { useAppStore } from "@/renderer/store/appStore"
 import { useRouter } from "vue-router"
 import { VueReader } from "vue-reader"
 import { Rendition } from "epubjs"
-import BookMetadataDialog from "@/renderer/components/library/BookMetadataDialog.vue"
 import ViewModeToggle from "@/renderer/components/library/ViewModeToggle.vue"
 import type { ListingViewMode } from "@/main/types/Settings"
+
+interface EnrichedBook {
+    filename: string
+    title: string
+    creator: string
+    rating: number
+    categories: string[]
+    progress: number
+}
 
 const bookStore = useBookStore()
 const appStore = useAppStore()
@@ -353,13 +669,25 @@ const router = useRouter()
 
 const books = ref<string[]>([])
 const noCovers = ref<Record<string, boolean>>({})
-const showEditDialog = ref(false)
-const editingBook = ref("")
+const search = ref("")
+const selectedCategory = ref("all")
+const sortBy = ref("title-asc")
+
+const activeAddMenu = ref<Record<string, boolean>>({})
+const activeAddMenuList = ref<Record<string, boolean>>({})
+const newCategoryInputs = ref<Record<string, string>>({})
 
 const viewMode = computed<ListingViewMode>({
     get: () => appStore.getSettings.listingViews.labeled,
     set: (mode) => appStore.setListingView("labeled", mode)
 })
+
+const sortOptions = [
+    { title: "Title: A-Z", value: "title-asc" },
+    { title: "Title: Z-A", value: "title-desc" },
+    { title: "Progress: High to Low", value: "progress-desc" },
+    { title: "Rating: High to Low", value: "rating-desc" }
+]
 
 const getProgressPercent = (filename: string): number => {
     const meta = bookStore.metadata[filename]
@@ -390,32 +718,171 @@ const getPageProgressText = (filename: string): string => {
     return "Unread"
 }
 
-const handleMetadataUpdated = (_event: unknown, newMeta: any) => {
-    bookStore.setMetadata(newMeta)
-}
-
-const handleEditTags = (_event: unknown, bookFile: string) => {
-    openEditDialog(bookFile)
-}
-
-onMounted(async () => {
-    await bookStore.loadMetadata()
-    await getBooks()
-    window.sevenCsApi.on("metadataUpdated", handleMetadataUpdated)
-    window.sevenCsApi.on("editTags", handleEditTags)
+const allExistingCategories = computed<string[]>(() => {
+    const set = new Set<string>()
+    books.value.forEach((filename) => {
+        const meta = bookStore.metadata[filename]
+        if (meta?.categories) {
+            meta.categories.forEach((cat) => {
+                const trimmed = cat.trim()
+                if (trimmed) set.add(trimmed)
+            })
+        }
+    })
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
 })
 
-onUnmounted(() => {
-    window.sevenCsApi.off("metadataUpdated", handleMetadataUpdated)
-    window.sevenCsApi.off("editTags", handleEditTags)
+const categoryFilterOptions = computed(() => {
+    const options = [
+        { title: "All Categories", value: "all" },
+        { title: "Uncategorized", value: "__uncategorized__" }
+    ]
+    allExistingCategories.value.forEach((cat) => {
+        const count = books.value.filter((b) => {
+            const meta = bookStore.metadata[b]
+            return meta?.categories?.some((c) => c.trim().toLowerCase() === cat.toLowerCase())
+        }).length
+        options.push({
+            title: `${cat} (${count})`,
+            value: cat
+        })
+    })
+    return options
 })
 
-async function getBooks() {
-    const list = await window.sevenCsApi.invoke("msgGetBooks")
-    books.value = list
+const getAvailableCategoriesForBook = (filename: string): string[] => {
+    const meta = bookStore.metadata[filename]
+    const bookCats = new Set((meta?.categories || []).map((c) => c.toLowerCase()))
+    return allExistingCategories.value.filter((cat) => !bookCats.has(cat.toLowerCase()))
 }
 
-const handleRendition = (book: string, rendition: Rendition) => {
+const enrichedBooks = computed<EnrichedBook[]>(() => {
+    return books.value.map((filename) => {
+        const meta = bookStore.metadata[filename] || {}
+        const info = bookStore.infoCache[filename] || {}
+        return {
+            filename,
+            title: info.title || filename.replace(".epub", "").replace(/[-_]/g, " "),
+            creator: info.creator || "Unknown Author",
+            rating: meta.rating || 0,
+            categories: meta.categories ? [...meta.categories] : [],
+            progress: getProgressPercent(filename)
+        }
+    })
+})
+
+const filteredBooks = computed<EnrichedBook[]>(() => {
+    const query = search.value ? search.value.trim().toLowerCase() : ""
+    const categoryFilter = selectedCategory.value
+
+    return enrichedBooks.value
+        .filter((book) => {
+            if (categoryFilter && categoryFilter !== "all") {
+                if (categoryFilter === "__uncategorized__") {
+                    if (book.categories && book.categories.length > 0) return false
+                } else {
+                    const hasCat = book.categories.some(
+                        (c) => c.trim().toLowerCase() === categoryFilter.toLowerCase()
+                    )
+                    if (!hasCat) return false
+                }
+            }
+
+            if (query) {
+                const titleMatch = book.title.toLowerCase().includes(query)
+                const authorMatch = book.creator.toLowerCase().includes(query)
+                const tagMatch = book.categories.some((c) => c.toLowerCase().includes(query))
+                if (!titleMatch && !authorMatch && !tagMatch) {
+                    return false
+                }
+            }
+
+            return true
+        })
+        .sort((a, b) => {
+            if (sortBy.value === "title-desc") return b.title.localeCompare(a.title)
+            if (sortBy.value === "progress-desc") return b.progress - a.progress
+            if (sortBy.value === "rating-desc") return b.rating - a.rating
+            return a.title.localeCompare(b.title)
+        })
+})
+
+const handleInlineRate = async (
+    filename: string,
+    title: string,
+    newRating: number
+): Promise<void> => {
+    const currentCategories = bookStore.metadata[filename]?.categories || []
+    await bookStore.saveMetadata(filename, newRating, currentCategories)
+    appStore.announce(`Rated ${title} ${newRating > 0 ? `${newRating} stars` : "unrated"}`)
+}
+
+const handleRemoveCategory = async (
+    filename: string,
+    categoryToRemove: string,
+    title: string
+): Promise<void> => {
+    const currentMeta = bookStore.metadata[filename] || {}
+    const currentCategories = currentMeta.categories ? [...currentMeta.categories] : []
+    const updated = currentCategories.filter((c) => c !== categoryToRemove)
+    await bookStore.saveMetadata(filename, currentMeta.rating || 0, updated)
+    appStore.announce(`Removed category ${categoryToRemove} from ${title}`)
+}
+
+const handleSaveTypedCategory = async (
+    filename: string,
+    title: string,
+    isList = false
+): Promise<void> => {
+    const raw = (newCategoryInputs.value[filename] || "").trim()
+    if (!raw) return
+    const currentMeta = bookStore.metadata[filename] || {}
+    const currentCategories = currentMeta.categories ? [...currentMeta.categories] : []
+    if (!currentCategories.some((c) => c.toLowerCase() === raw.toLowerCase())) {
+        const updated = [...currentCategories, raw]
+        await bookStore.saveMetadata(filename, currentMeta.rating || 0, updated)
+        appStore.announce(`Added category ${raw} to ${title}`)
+    }
+    newCategoryInputs.value[filename] = ""
+    if (isList) {
+        activeAddMenuList.value[filename] = false
+    } else {
+        activeAddMenu.value[filename] = false
+    }
+}
+
+const handleSelectExistingCategory = async (
+    filename: string,
+    category: string,
+    title: string,
+    isList = false
+): Promise<void> => {
+    const currentMeta = bookStore.metadata[filename] || {}
+    const currentCategories = currentMeta.categories ? [...currentMeta.categories] : []
+    if (!currentCategories.some((c) => c.toLowerCase() === category.toLowerCase())) {
+        const updated = [...currentCategories, category]
+        await bookStore.saveMetadata(filename, currentMeta.rating || 0, updated)
+        appStore.announce(`Added category ${category} to ${title}`)
+    }
+    if (isList) {
+        activeAddMenuList.value[filename] = false
+    } else {
+        activeAddMenu.value[filename] = false
+    }
+}
+
+const resetFilters = (): void => {
+    search.value = ""
+    selectedCategory.value = "all"
+    sortBy.value = "title-asc"
+}
+
+const handleOpenBook = (filename: string): void => {
+    bookStore.setBookName(filename)
+    router.push("/reader")
+}
+
+const handleRendition = (book: string, rendition: Rendition): void => {
     rendition.book.ready
         .then(() => {
             rendition.book.loaded.metadata
@@ -426,12 +893,15 @@ const handleRendition = (book: string, rendition: Rendition) => {
                     } catch {
                         noCovers.value[book] = true
                     }
+                    const bookAny = rendition.book as any
+                    const rawMeta =
+                        metadata || (bookAny.package ? bookAny.package.metadata : {}) || {}
+                    bookStore.setBookInfo(book, { ...rawMeta, cover, isMetadataLoaded: true })
                     if (cover) {
                         bookStore.setCover(book, cover)
                     } else {
                         noCovers.value[book] = true
                     }
-                    bookStore.setBookInfo(book, { ...metadata, cover })
                 })
                 .catch(() => {
                     noCovers.value[book] = true
@@ -442,68 +912,24 @@ const handleRendition = (book: string, rendition: Rendition) => {
         })
 }
 
-const categorizedGroups = computed(() => {
-    if (books.value.length === 0) return []
+async function getBooks(): Promise<void> {
+    const list = await window.sevenCsApi.invoke("msgGetBooks")
+    books.value = list
+}
 
-    const groups: Record<string, any[]> = {}
-    const uncategorized: any[] = []
+const handleMetadataUpdated = (_event: unknown, newMeta: any): void => {
+    bookStore.setMetadata(newMeta)
+}
 
-    books.value.forEach((filename) => {
-        const meta = bookStore.metadata[filename] || { rating: 0, categories: [] }
-        const info = bookStore.infoCache[filename] || {}
-        const bookObj = {
-            filename,
-            rating: meta.rating || 0,
-            categories: meta.categories || [],
-            title: info.title || filename.replace(".epub", "").replace(/[-_]/g, " "),
-            creator: info.creator || "Unknown Author"
-        }
-
-        if (!bookObj.categories || bookObj.categories.length === 0) {
-            uncategorized.push(bookObj)
-        } else {
-            bookObj.categories.forEach((cat) => {
-                const cleanCat = cat.trim()
-                if (cleanCat) {
-                    if (!groups[cleanCat]) {
-                        groups[cleanCat] = []
-                    }
-                    groups[cleanCat].push(bookObj)
-                }
-            })
-        }
-    })
-
-    const list = Object.keys(groups)
-        .sort()
-        .map((name) => ({
-            name,
-            books: groups[name]
-        }))
-
-    if (uncategorized.length > 0) {
-        list.push({
-            name: "Uncategorized",
-            books: uncategorized
-        })
-    }
-
-    return list
+onMounted(async () => {
+    await bookStore.loadMetadata()
+    await getBooks()
+    window.sevenCsApi.on("metadataUpdated", handleMetadataUpdated)
 })
 
-const handleOpenBook = (filename: string) => {
-    bookStore.setBookName(filename)
-    router.push("/reader")
-}
-
-const openEditDialog = (filename: string) => {
-    editingBook.value = filename
-    showEditDialog.value = true
-}
-
-const onMetadataSaved = () => {
-    bookStore.loadMetadata()
-}
+onUnmounted(() => {
+    window.sevenCsApi.off("metadataUpdated", handleMetadataUpdated)
+})
 </script>
 
 <style scoped>
@@ -513,30 +939,12 @@ const onMetadataSaved = () => {
     min-height: 100vh;
 }
 
-.header-card {
+.header-card,
+.labeled-card,
+.labeled-list-item,
+.add-category-popover {
     background-color: rgb(var(--v-theme-surface));
-    border: 1px solid rgba(var(--v-theme-on-surface), 0.12);
-}
-
-.horizontal-scroll-row {
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(var(--v-theme-on-surface), 0.18) transparent;
-}
-
-.horizontal-scroll-row::-webkit-scrollbar {
-    height: 6px;
-}
-
-.horizontal-scroll-row::-webkit-scrollbar-thumb {
-    background: rgba(var(--v-theme-on-surface), 0.2);
-    border-radius: 3px;
-}
-
-.shelf-book-card,
-.shelf-list-item {
-    background-color: rgb(var(--v-theme-surface));
+    border-color: rgba(var(--v-theme-on-surface), 0.12);
 }
 
 .cover-container,
@@ -550,6 +958,8 @@ const onMetadataSaved = () => {
     height: 64px;
 }
 
+.cover-clickable,
+.title-clickable,
 .clickable {
     cursor: pointer;
 }
@@ -558,20 +968,8 @@ const onMetadataSaved = () => {
     min-width: 0;
 }
 
-.hover-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(18, 18, 18, 0.85);
-    backdrop-filter: blur(2px);
-    z-index: 2;
-}
-
-.text-truncate-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.1rem;
-    height: 2.2rem;
+.existing-categories-scroll {
+    max-height: 120px;
+    overflow-y: auto;
 }
 </style>

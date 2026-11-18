@@ -55,6 +55,15 @@
                     <div class="pb-2">
                         <v-list>
                             <v-list-item
+                                prepend-icon="mdi-information-outline"
+                                :title="$t('ui-labels.nav-bar.about')"
+                                density="comfortable"
+                                flat
+                                value="about"
+                                data-testid="nav-about"
+                                @click="openAbout"
+                            />
+                            <v-list-item
                                 prepend-icon="mdi-cog-outline"
                                 :title="$t('ui-labels.nav-bar.settings')"
                                 density="comfortable"
@@ -124,7 +133,11 @@ const isCurrentRoute = (path: string): boolean => {
 }
 
 const openSettings = (): void => {
-    appStore.setOpenSettings(true)
+    appStore.setOpenSettings(true, "general")
+}
+
+const openAbout = (): void => {
+    appStore.setOpenSettings(true, "about")
 }
 
 const handleExit = (): void => {

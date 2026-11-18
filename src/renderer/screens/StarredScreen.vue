@@ -4,7 +4,9 @@
             <v-col cols="12">
                 <v-card class="header-card rounded px-6 py-6 d-flex align-center">
                     <v-avatar size="64" color="amber-lighten-4" class="mr-4 elevation-2">
-                        <v-icon size="36" color="amber-darken-3" aria-hidden="true">mdi-star</v-icon>
+                        <v-icon size="36" color="amber-darken-3" aria-hidden="true"
+                            >mdi-star</v-icon
+                        >
                     </v-avatar>
                     <div>
                         <h1 class="text-h4 font-weight-black mb-1">
@@ -225,9 +227,7 @@
                                                         </v-icon>
                                                         {{ getProgressPercent(book.filename) }}%
                                                     </span>
-                                                    <span
-                                                        class="text-caption text-medium-emphasis"
-                                                    >
+                                                    <span class="text-caption text-medium-emphasis">
                                                         {{ getPageProgressText(book.filename) }}
                                                     </span>
                                                 </div>
@@ -339,7 +339,9 @@
                                             "
                                             v-show="false"
                                             :url="`./epubs/${book.filename}`"
-                                            :get-rendition="(r) => handleRendition(book.filename, r)"
+                                            :get-rendition="
+                                                (r) => handleRendition(book.filename, r)
+                                            "
                                         />
 
                                         <div
@@ -363,7 +365,10 @@
                                                 v-else
                                                 class="d-flex align-center justify-center fill-height"
                                             >
-                                                <v-icon size="24" icon="mdi-book-open-blank-variant" />
+                                                <v-icon
+                                                    size="24"
+                                                    icon="mdi-book-open-blank-variant"
+                                                />
                                             </div>
                                         </div>
 
@@ -376,10 +381,14 @@
                                             @keydown.enter="handleOpenBook(book.filename)"
                                             @keydown.space.prevent="handleOpenBook(book.filename)"
                                         >
-                                            <div class="text-subtitle-1 font-weight-bold text-truncate">
+                                            <div
+                                                class="text-subtitle-1 font-weight-bold text-truncate"
+                                            >
                                                 {{ book.title }}
                                             </div>
-                                            <div class="text-caption text-medium-emphasis text-truncate">
+                                            <div
+                                                class="text-caption text-medium-emphasis text-truncate"
+                                            >
                                                 {{ book.creator }}
                                             </div>
                                         </div>
@@ -434,9 +443,7 @@
                                                 "
                                             >
                                                 {{
-                                                    book.rating > 0
-                                                        ? `${book.rating}.0`
-                                                        : "Unrated"
+                                                    book.rating > 0 ? `${book.rating}.0` : "Unrated"
                                                 }}
                                             </span>
                                         </div>
@@ -613,9 +620,7 @@ const filteredBooks = computed<EnrichedBook[]>(() => {
 
 const visibleRatingGroups = computed(() => {
     const ratingsToShow =
-        selectedRating.value === "all"
-            ? [...ALL_RATING_GROUPS]
-            : [Number(selectedRating.value)]
+        selectedRating.value === "all" ? [...ALL_RATING_GROUPS] : [Number(selectedRating.value)]
 
     return ratingsToShow.map((rating) => ({
         rating,

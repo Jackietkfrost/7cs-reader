@@ -150,6 +150,7 @@ import {
     extractDocumentChunks,
     highlightChunkInDocument
 } from "@/renderer/utils/textChunker"
+import { fixEpubImages } from "@/renderer/utils/epubImageFixer"
 
 const router = useRouter()
 const bookStore = useBookStore()
@@ -333,6 +334,15 @@ const applyReaderStyling = (target: Rendition | null): void => {
         blockquote: {
             "background-color": `${palette.quoteBg} !important`,
             color: `${palette.fg} !important`
+        },
+        img: {
+            "max-width": "100% !important",
+            height: "auto",
+            "object-fit": "contain"
+        },
+        image: {
+            "max-width": "100% !important",
+            height: "auto"
         }
     })
 
@@ -352,6 +362,17 @@ function getActiveIframeDocument(): any {
         }
     }
     return null
+}
+
+function fixCurrentReaderImages(): void {
+    if (!rendition) {
+        return
+    }
+    const rawContents = rendition.getContents() as any
+    const contentList = Array.isArray(rawContents) ? rawContents : rawContents ? [rawContents] : []
+    for (const c of contentList) {
+        fixEpubImages(c, rendition.book)
+    }
 }
 
 function clearSentenceHighlight(): void {
@@ -546,7 +567,22 @@ async function fallbackToSystemTtsFromReader(): Promise<void> {
 
 const getRendition = (val: Rendition): void => {
     rendition = val
+    ;(window as any).__readerRendition = val
     applyReaderStyling(val)
+
+    val.hooks.content.register(async (contents: any) => {
+        await fixEpubImages(contents, val.book)
+    })
+
+    val.on("rendered", (_section: any, view: any) => {
+        if (view?.contents) {
+            fixEpubImages(view.contents, val.book)
+        }
+    })
+
+    val.on("relocated", () => {
+        fixCurrentReaderImages()
+    })
 
     rendition.book.ready.then(() => {
         rendition?.book.locations
@@ -648,6 +684,8 @@ const locationChange = (epubcifi: string): void => {
             page.value = `Page ${cPage} of ${tPage}${chapterLabel}`
             appStore.announce(page.value)
         }
+
+        fixCurrentReaderImages()
 
         bookStore.saveBookmark(bookName.value, epubcifi, progress, currentPage, totalPages)
     }

@@ -63,6 +63,13 @@
                 >
                     {{ $t("settings.tabs.config") }}
                 </v-tab>
+                <v-tab
+                    value="about"
+                    prepend-icon="mdi-information-outline"
+                    data-testid="settings-tab-about"
+                >
+                    {{ $t("settings.tabs.about") }}
+                </v-tab>
             </v-tabs>
 
             <v-divider />
@@ -1082,6 +1089,129 @@
                             </v-btn>
                         </div>
                     </v-tabs-window-item>
+
+                    <v-tabs-window-item value="about" data-testid="settings-window-about">
+                        <div class="d-flex flex-column align-center text-center py-4 px-2">
+                            <v-avatar color="primary" variant="tonal" size="76" class="mb-3">
+                                <v-icon icon="mdi-bookshelf" size="44" color="primary" />
+                            </v-avatar>
+                            <h2 class="text-h5 font-weight-bold mb-1" data-testid="about-app-title">
+                                7C's Reader
+                            </h2>
+                            <v-chip
+                                color="primary"
+                                size="small"
+                                variant="flat"
+                                class="mb-4 font-weight-bold"
+                                prepend-icon="mdi-tag-outline"
+                                data-testid="about-version-chip"
+                            >
+                                v{{ appVersion }}
+                            </v-chip>
+
+                            <p
+                                class="text-body-1 text-medium-emphasis mb-6"
+                                style="max-width: 600px; line-height: 1.65"
+                                data-testid="about-descriptor"
+                            >
+                                {{ $t("settings.about-description") }}
+                            </p>
+
+                            <v-divider class="w-100 mb-6" />
+
+                            <v-row class="w-100 ga-3 justify-center mb-6" no-gutters>
+                                <v-col cols="12" sm="5">
+                                    <v-card
+                                        variant="outlined"
+                                        class="pa-4 h-100 text-left link-card cursor-pointer"
+                                        data-testid="about-github-link"
+                                        data-url="https://github.com/Jackietkfrost/7cs-reader"
+                                        tabindex="0"
+                                        role="link"
+                                        aria-label="GitHub Repository"
+                                        @click="
+                                            openExternalUrl(
+                                                'https://github.com/Jackietkfrost/7cs-reader'
+                                            )
+                                        "
+                                        @keydown.enter="
+                                            openExternalUrl(
+                                                'https://github.com/Jackietkfrost/7cs-reader'
+                                            )
+                                        "
+                                        @keydown.space.prevent="
+                                            openExternalUrl(
+                                                'https://github.com/Jackietkfrost/7cs-reader'
+                                            )
+                                        "
+                                    >
+                                        <div class="d-flex align-center mb-2">
+                                            <v-icon
+                                                icon="mdi-github"
+                                                size="28"
+                                                class="mr-3"
+                                                color="primary"
+                                            />
+                                            <div>
+                                                <div class="font-weight-bold text-subtitle-1">
+                                                    {{ $t("settings.about-github") }}
+                                                </div>
+                                                <div class="text-caption text-medium-emphasis">
+                                                    github.com/Jackietkfrost/7cs-reader
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="text-caption text-medium-emphasis mb-0">
+                                            {{ $t("settings.about-github-sub") }}
+                                        </p>
+                                    </v-card>
+                                </v-col>
+
+                                <v-col cols="12" sm="5">
+                                    <v-card
+                                        variant="outlined"
+                                        class="pa-4 h-100 text-left link-card cursor-pointer"
+                                        data-testid="about-kofi-link"
+                                        :data-url="kofiLink"
+                                        tabindex="0"
+                                        role="link"
+                                        aria-label="Support on Ko-fi"
+                                        @click="openExternalUrl(kofiLink)"
+                                        @keydown.enter="openExternalUrl(kofiLink)"
+                                        @keydown.space.prevent="openExternalUrl(kofiLink)"
+                                    >
+                                        <div class="d-flex align-center mb-2">
+                                            <v-icon
+                                                icon="mdi-coffee"
+                                                size="28"
+                                                class="mr-3"
+                                                color="amber-darken-2"
+                                            />
+                                            <div>
+                                                <div class="font-weight-bold text-subtitle-1">
+                                                    {{ $t("settings.about-kofi") }}
+                                                </div>
+                                                <div class="text-caption text-medium-emphasis">
+                                                    ko-fi.com/jackietkfrost
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="text-caption text-medium-emphasis mb-0">
+                                            {{ $t("settings.about-kofi-sub") }}
+                                        </p>
+                                    </v-card>
+                                </v-col>
+                            </v-row>
+
+                            <div
+                                class="text-caption text-medium-emphasis d-flex align-center"
+                                data-testid="about-love-tagline"
+                            >
+                                <v-icon icon="mdi-heart" color="error" size="16" class="mr-1" />
+                                <span>{{ $t("settings.about-made-with-love") }}</span>
+                            </div>
+                        </div>
+                    </v-tabs-window-item>
                 </v-tabs-window>
             </v-card-text>
 
@@ -1127,12 +1257,41 @@ import {
     isVoiceToTextSupported
 } from "@/renderer/utils/speech"
 import { cleanTextForSpeech, splitIntoSentences } from "@/renderer/utils/textChunker"
+import { openExternal } from "@/renderer/utils"
 import RhvoiceInstallDialog from "./RhvoiceInstallDialog.vue"
 
 const { availableLocales, t } = useI18n()
 const appStore = useAppStore()
 
-const activeTab = ref("general")
+const activeTab = ref(appStore.activeSettingsTab || "general")
+const appVersion = ref("0.1.0")
+
+const openExternalUrl = async (url: string): Promise<void> => {
+    ;(window as any).__lastOpenedExternalUrl = url
+    try {
+        await openExternal(url)
+    } catch (e) {
+        console.error("Failed to open external URL:", url, e)
+    }
+}
+
+watch(
+    () => appStore.activeSettingsTab,
+    (tab) => {
+        if (tab) {
+            activeTab.value = tab
+        }
+    }
+)
+
+watch(
+    () => appStore.openedSettings,
+    (opened) => {
+        if (opened && appStore.activeSettingsTab) {
+            activeTab.value = appStore.activeSettingsTab
+        }
+    }
+)
 const languages = ref<string[]>([])
 const voices = ref<SpeechVoiceOption[]>([])
 const showRhvoicePrompt = ref(false)
@@ -1154,7 +1313,7 @@ const dictationTranscript = ref("")
 const dictationStatus = ref("")
 let recognizer: VoiceRecognizerController | null = null
 let testReader: ChunkedReaderController | null = null
-
+const kofiLink = "https://ko-fi.com/jackietkfrost"
 const ttsSupported = isTtsSupported()
 const vttSupported = isVoiceToTextSupported()
 
@@ -1697,13 +1856,21 @@ watch(
     }
 )
 
-onMounted(() => {
+onMounted(async () => {
     languages.value = availableLocales
     refreshVoices()
     if (ttsSupported) {
         window.speechSynthesis.addEventListener("voiceschanged", refreshVoices)
     }
     document.addEventListener("keydown", handleKeyDown)
+    try {
+        const ver = await window.sevenCsApi.invoke("msgRequestGetVersion")
+        if (ver) {
+            appVersion.value = ver
+        }
+    } catch (e) {
+        // Fallback
+    }
 })
 
 onUnmounted(() => {
@@ -1727,5 +1894,23 @@ onUnmounted(() => {
     transition:
         background-color 0.2s ease,
         color 0.2s ease;
+}
+
+.link-card {
+    border-radius: 4px !important;
+    transition:
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.link-card:hover {
+    border-color: rgb(var(--v-theme-primary)) !important;
+    transform: translateY(-2px);
+}
+
+.link-card:focus-visible {
+    outline: 2px solid rgb(var(--v-theme-primary)) !important;
+    outline-offset: 2px;
 }
 </style>

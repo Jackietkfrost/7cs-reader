@@ -19,6 +19,7 @@ type SnackbarQueue = {
 
 type AppState = {
     openedSettings: boolean
+    activeSettingsTab: string
     settingsLoaded: boolean
     configPath: string
     settings: AppSettings
@@ -60,6 +61,7 @@ function applySettingsToEnvironment(settings: AppSettings): void {
 export const useAppStore = defineStore("appStore", {
     state: (): AppState => ({
         openedSettings: false,
+        activeSettingsTab: "general",
         settingsLoaded: false,
         configPath: "",
         settings: normalizeSettings(DEFAULT_APP_SETTINGS),
@@ -82,8 +84,11 @@ export const useAppStore = defineStore("appStore", {
             resolveVuetifyThemeName(state.settings.nightMode, state.settings.highContrast)
     },
     actions: {
-        setOpenSettings(openedSettings: boolean): void {
+        setOpenSettings(openedSettings: boolean, tab?: string): void {
             this.openedSettings = openedSettings
+            if (tab) {
+                this.activeSettingsTab = tab
+            }
         },
         announce(message: string): void {
             if (!this.settings.screenReaderAnnouncements || !message.trim()) {
@@ -160,7 +165,9 @@ export const useAppStore = defineStore("appStore", {
                 }
             })
             this.announce(
-                mode === "list" ? `Switched ${screen} to list view` : `Switched ${screen} to gallery view`
+                mode === "list"
+                    ? `Switched ${screen} to list view`
+                    : `Switched ${screen} to gallery view`
             )
         },
         async updateBookTypography(patch: Partial<BookTypographySettings>): Promise<void> {
