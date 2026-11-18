@@ -10,7 +10,7 @@
     </v-tooltip>
 </template>
 <script setup lang="ts">
-import { BookMetaData } from "@/main/types/book"
+import type { BookMetaData } from "@/main/types/Book"
 
-const { information } = defineProps<{ information: BookMetaData | {} }>()
+const { information } = defineProps<{ information: Partial<BookMetaData> }>()
 </script>

@@ -14,4 +14,5 @@ export interface BookMetaData {
     viewport: string
     spread: string
     isbn?: string
+    cover?: string
 }

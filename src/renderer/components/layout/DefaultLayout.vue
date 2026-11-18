@@ -1,39 +1,55 @@
 <template>
     <v-app>
-        <v-layout>
-            <v-navigation-drawer absolute permanent expand-on-hover rail>
+        <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {{ appStore.announcement }}
+        </div>
+        <v-layout style="height: 100vh">
+            <v-navigation-drawer permanent expand-on-hover rail aria-label="Main navigation">
                 <v-list density="compact" nav>
                     <v-list-item
                         prepend-icon="mdi-bookshelf"
                         :title="$t('ui-labels.nav-bar.library')"
                         value="library"
-                        :class="{ active: isCurrentRoute('/') }"
+                        :active="isCurrentRoute('/')"
+                        data-testid="nav-library"
                         @click="handleRoute('/')"
-                    ></v-list-item>
+                    />
                     <v-list-item
                         :disabled="!isBookSelected"
                         prepend-icon="mdi-book-open-page-variant-outline"
                         :title="$t('ui-labels.nav-bar.current')"
-                        value="myfiles"
-                        :class="{ active: isCurrentRoute('/reader') }"
+                        value="current"
+                        :active="isCurrentRoute('/reader')"
+                        data-testid="nav-current"
                         @click="handleRoute('/reader')"
-                    ></v-list-item>
+                    />
                     <v-list-item
                         v-if="appStore.tagsVisible"
                         prepend-icon="mdi-tag-outline"
                         :title="$t('ui-labels.nav-bar.labels')"
-                        value="shared"
-                        :class="{ active: isCurrentRoute('/labels') }"
+                        value="labels"
+                        :active="isCurrentRoute('/labels')"
+                        data-testid="nav-labels"
                         @click="handleRoute('/labels')"
-                    ></v-list-item>
+                    />
                     <v-list-item
                         v-if="appStore.ratingsVisible"
                         prepend-icon="mdi-star-outline"
                         :title="$t('ui-labels.nav-bar.starred')"
                         value="starred"
-                        :class="{ active: isCurrentRoute('/starred') }"
+                        :active="isCurrentRoute('/starred')"
+                        data-testid="nav-starred"
                         @click="handleRoute('/starred')"
-                    ></v-list-item>
+                    />
+                    <v-list-item
+                        v-if="appStore.archivesVisible"
+                        prepend-icon="mdi-file-download"
+                        :title="$t('ui-labels.nav-bar.archive')"
+                        value="archive"
+                        :active="isCurrentRoute('/archive')"
+                        data-testid="nav-archive"
+                        @click="handleRoute('/archive')"
+                    />
                 </v-list>
                 <template #append>
                     <div class="pb-2">
@@ -44,24 +60,25 @@
                                 density="comfortable"
                                 flat
                                 value="settings"
-                                @click="openSettings()"
-                            ></v-list-item>
-                            <v-divider></v-divider>
+                                data-testid="nav-settings"
+                                @click="openSettings"
+                            />
+                            <v-divider />
                             <v-list-item
                                 prepend-icon="mdi-door-open"
                                 :title="$t('ui-labels.nav-bar.exit')"
                                 density="compact"
                                 class="exit-btn"
                                 flat
-                                value="library"
-                                @click="handleExit()"
-                            ></v-list-item>
+                                value="exit"
+                                data-testid="nav-exit"
+                                @click="handleExit"
+                            />
                         </v-list>
                     </div>
                 </template>
             </v-navigation-drawer>
-            <v-main>
-                <!-- <HeaderLayout /> -->
+            <v-main style="height: 100vh; overflow-y: auto">
                 <slot />
             </v-main>
         </v-layout>
@@ -79,29 +96,25 @@
 </template>
 
 <script setup lang="ts">
-// import HeaderLayout from "@/renderer/components/layout/HeaderLayout.vue"
 import { useRoute, useRouter } from "vue-router"
 import { storeToRefs } from "pinia"
 import { useBookStore } from "@/renderer/store/bookStore"
-import { ref, watch } from "vue"
+import { onMounted, onUnmounted, ref, watch } from "vue"
 import { useAppStore } from "@/renderer/store/appStore"
 import SettingsPage from "../settings-page.vue"
-// import { useTheme } from "vuetify"
+import type { SettingsPayload } from "@/main/types/Settings"
 
-// const theme = useTheme()
 const bookStore = useBookStore()
 const appStore = useAppStore()
 const { bookName } = storeToRefs(bookStore)
-const { setOpenSettings } = useAppStore()
-const isBookSelected = ref(false)
+const isBookSelected = ref(Boolean(bookStore.bookName))
 const router = useRouter()
-const route: any = useRoute()
+const route = useRoute()
 
-watch(bookName, (newValue, oldValue) => {
-    // TODO: Do something when the bookName changes
-    isBookSelected.value = !!newValue && newValue !== null
-    console.log(isBookSelected.value)
+watch(bookName, (newValue) => {
+    isBookSelected.value = Boolean(newValue)
 })
+
 const handleRoute = (path: string): void => {
     router.push(path)
 }
@@ -111,18 +124,37 @@ const isCurrentRoute = (path: string): boolean => {
 }
 
 const openSettings = (): void => {
-    setOpenSettings(true)
+    appStore.setOpenSettings(true)
 }
 
 const handleExit = (): void => {
-    // appStore.setExitApp(true)
-    appStore.addSnackbar("Exit", "error")
-    // console.log("Exit")
+    window.sevenCsApi.invoke("msgExitApp")
 }
 
-// const handleChangeTheme = (): void => {
-//     theme.global.name.value = theme.global.current.value.dark ? "light" : "dark"
-// }
+const handleSettingsUpdated = (_event: unknown, payload: SettingsPayload): void => {
+    appStore.applyPayload(payload)
+}
+
+const handleGlobalShortcut = (event: KeyboardEvent): void => {
+    if (!appStore.getSettings.keyboardNavigationHints) {
+        return
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key === ",") {
+        event.preventDefault()
+        appStore.setOpenSettings(!appStore.getOpenedSettings)
+    }
+}
+
+onMounted(async () => {
+    await appStore.loadSettings()
+    window.sevenCsApi.on("settingsUpdated", handleSettingsUpdated)
+    window.addEventListener("keydown", handleGlobalShortcut)
+})
+
+onUnmounted(() => {
+    window.sevenCsApi.off("settingsUpdated", handleSettingsUpdated)
+    window.removeEventListener("keydown", handleGlobalShortcut)
+})
 </script>
 
 <style scoped>

@@ -1,28 +1,35 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron"
 
-// mainAvailChannels: Whitelist of valid channels used for IPC communication (Send message from Main to Renderer)
 const mainAvailChannels: string[] = [
     "msgRequestGetVersion",
     "msgOpenExternalLink",
     "msgOpenFile",
     "msgGetFonts",
     "msgGetBooks",
-    "msgOpenBook",
     "msgAddBook",
     "msgGetBookPath",
-    "eSendLibrary",
     "openContextMenu",
-    "deleteBook"
+    "msgGetMetadata",
+    "msgSaveMetadata",
+    "msgGetSettings",
+    "msgSaveSettings",
+    "msgResetSettings",
+    "msgRevealSettingsFile",
+    "msgExportSettings",
+    "msgImportSettings",
+    "msgExitApp",
+    "msgGetLocalTtsStatus",
+    "msgGetLocalTtsVoices",
+    "msgSynthesizeLocalTts",
+    "msgPickRhvoiceBinary"
 ]
 
-// rendererAvailChannels: Whitelist of valid channels used for IPC communication (Send message from Renderer to Main)
 const rendererAvailChannels: string[] = [
-    "rFindInExplorer",
-    "rSetTags",
     "deleteConfirmed",
     "openBook",
     "editTags",
-    "editMeta"
+    "metadataUpdated",
+    "settingsUpdated"
 ]
 
 contextBridge.exposeInMainWorld("sevenCsApi", {
