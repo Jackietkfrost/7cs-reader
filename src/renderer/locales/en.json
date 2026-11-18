@@ -1,0 +1,52 @@
+{
+    "desc": {},
+    "title": {
+        "main": "7C's Reader",
+        "reader": "Reader Screen",
+        "labels": "Labels",
+        "starred": "Starred",
+        "error": "Unknown Error",
+        "change-theme": "Change Theme"
+    },
+    "menu": {
+        "change-theme": "Change Theme",
+        "change-language": "Change Language",
+        "documentation": "Documentation",
+        "github": "Source Code",
+        "open-file": "Open a text file",
+        "add-book": "Add a new book"
+    },
+    "settings": {
+        "dark-mode": "Dark Mode",
+        "language": "Language",
+        "tags-page": "Enable Tag Pages",
+        "ratings-page": "Enable Ratings Pages",
+        "fonts": "Book Font",
+        "default-font": "Default",
+        "font-size": "Book Font Size"
+    },
+    "ui-labels": {
+        "nav-bar": {
+            "library": "Library",
+            "current": "Current Book",
+            "labels": "Labels",
+            "starred": "Starred",
+            "archive": "Anna's Archive",
+            "settings": "Settings",
+            "exit": "Exit"
+        },
+        "close-button": "Close",
+        "back-button": "Back",
+        "next-button": "Next",
+        "previous-button": "Previous",
+        "next-chapter-button": "Next Chapter",
+        "previous-chapter-button": "Previous Chapter",
+        "next-page-button": "Next Page",
+        "previous-page-button": "Previous Page",
+        "search-button": "Search",
+        "settings-button": "Settings",
+        "share-button": "Share",
+        "dark-mode-button": "Dark Mode",
+        "close-reader-button": "Close Reader"
+    }
+}

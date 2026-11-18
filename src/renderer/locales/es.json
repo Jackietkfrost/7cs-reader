@@ -1,0 +1,53 @@
+{
+    "desc": {
+        "welcome-title": "Hola Vutron! Todo está listo.",
+        "welcome-desc": "Ahora puede escribir aplicaciones web multiplataforma. Vea sus cambios en tiempo real y cree en múltiples plataformas con un solo comando. Si aún no está familiarizado con él, puede obtener ayuda en la página de documentación a continuación o ejecutar un código de ejemplo preescrito.",
+        "second-desc": "¡Movido a la segunda pantalla! ¡Aquí no hay ninguno!",
+        "selected-file": "Archivo seleccionado: {filePath}."
+    },
+    "title": {
+        "main": "Lector de 7C's",
+        "second": "segunda pantalla",
+        "error": "Se produjo un error"
+    },
+    "menu": {
+        "change-theme": "cambiar de tema",
+        "change-language": "cambiar idioma",
+        "increase-count": "aumentar la cuenta en 1",
+        "documentation": "documento",
+        "github": "código fuente",
+        "open-file": "Abrir un archivo de texto"
+    },
+    "settings": {
+        "dark-mode": "Modo Oscuro",
+        "language": "Lenguaje",
+        "tags-page": "Abiliita pagina de Clasificación",
+        "ratings-page": "Abilitia pagina de puntajes",
+        "fonts": "Fuente de Libro",
+        "default-font": "Predeterminado",
+        "font-size": "Tamaño de Fuente de Libro"
+    },
+    "ui-labels": {
+        "nav-bar": {
+            "library": "Libreria",
+            "current": "Libro Actual",
+            "labels": "Etiquetas",
+            "starred": "Favoritos",
+            "settings": "Configuración",
+            "exit": "Cerrar"
+        },
+        "close-button": "Close",
+        "back-button": "Back",
+        "next-button": "Next",
+        "previous-button": "Previous",
+        "next-chapter-button": "Next Chapter",
+        "previous-chapter-button": "Previous Chapter",
+        "next-page-button": "Next Page",
+        "previous-page-button": "Previous Page",
+        "search-button": "Search",
+        "settings-button": "Settings",
+        "share-button": "Share",
+        "dark-mode-button": "Dark Mode",
+        "close-reader-button": "Close Reader"
+    }
+}
